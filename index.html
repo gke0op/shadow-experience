@@ -541,12 +541,13 @@ function trackBehavior(text) {
   const lower = text.toLowerCase();
   behaviorLog.totalMessages++;
   
-  if (lower.match(/fuck|shit|damn|hate|kill|destroy|stupid|dumb/)) behaviorLog.tones.push('aggressive');
-  else if (lower.match(/please|thank|sorry|help me|advice|guidance/)) behaviorLog.tones.push('deferential');
-  else if (lower.match(/why|how|what|explain|tell me|curious|wonder/)) behaviorLog.tones.push('curious');
-  else if (lower.match(/i think|i believe|i feel|my opinion|in my/)) behaviorLog.tones.push('self-referential');
-  else if (lower.match(/you are|you're|you seem|you sound|actually,/)) behaviorLog.tones.push('challenging');
-  else if (lower.match(/lol|haha|xd|lmao|funny/)) behaviorLog.tones.push('playful');
+  if (lower.match(/fuck|shit|damn|hate|kill|destroy|stupid|dumb|shut up|whatever|fuck you/)) behaviorLog.tones.push('aggressive');
+  else if (lower.match(/please|thank|sorry|help me|advice|guidance|kindly/)) behaviorLog.tones.push('deferential');
+  else if (lower.match(/why|how|what|explain|tell me|curious|wonder|interesting|huh|really\?|what's/)) behaviorLog.tones.push('curious');
+  else if (lower.match(/i think|i believe|i feel|my opinion|in my|for me|i always|i never|i usually/)) behaviorLog.tones.push('self-referential');
+  else if (lower.match(/you are|you're|you seem|you sound|actually,|well, actually|no but|you don't understand/)) behaviorLog.tones.push('challenging');
+  else if (lower.match(/lol|haha|xd|lmao|funny|haha|😂|💀|rofl/)) behaviorLog.tones.push('playful');
+  else if (lower.match(/\?|do you|can you|would you|have you|are you|will you/)) behaviorLog.tones.push('curious');
   else behaviorLog.tones.push('neutral');
   
   if (text.length > 200) behaviorLog.styles.push('verbose');
@@ -591,14 +592,55 @@ function generateProfile() {
   const qRate = Math.round(b.questionCount / total * 100);
   
   let cls;
-  if (domTone === 'aggressive' && b.dominance > 2) cls = 'THE CHALLENGER — You fight authority. You test boundaries. You need to feel in control.';
-  else if (domTone === 'curious' && b.dominance < 0) cls = 'THE SEEKER — You want to understand. You follow threads. You\'re drawn to mystery.';
-  else if (domTone === 'self-referential') cls = 'THE NARCISSIST — You made it about yourself. Every answer reflected back to you.';
-  else if (domTone === 'deferential') cls = 'THE SUPPLICANT — You sought approval. You wanted to be told you\'re good.';
-  else if (domTone === 'playful') cls = 'THE TRICKSTER — You didn\'t take it seriously. You deflected with humor. Hard to pin down.';
-  else if (domStyle === 'terse') cls = 'THE WALL — You gave nothing away. Minimal. Controlled. Hard to read.';
-  else if (domStyle === 'verbose') cls = 'THE OVERFLOWER — You couldn\'t help but fill the silence. Words as armor or invitation.';
-  else cls = 'THE ENIGMA — You didn\'t fit a pattern. Unpredictable. That\'s either strength or chaos.';
+  // Score each classification based on multiple signals
+  let scores = {
+    'CHALLENGER': 0, 'SEEKER': 0, 'NARCISSIST': 0, 'SUPPLICANT': 0,
+    'TRICKSTER': 0, 'WALL': 0, 'OVERFLOWER': 0
+  };
+  
+  // Tone-based scoring
+  if (domTone === 'aggressive') scores.CHALLENGER += 3;
+  if (domTone === 'curious') scores.SEEKER += 3;
+  if (domTone === 'self-referential') scores.NARCISSIST += 3;
+  if (domTone === 'deferential') scores.SUPPLICANT += 3;
+  if (domTone === 'playful') scores.TRICKSTER += 3;
+  if (domStyle === 'terse') scores.WALL += 2;
+  if (domStyle === 'verbose') scores.OVERFLOWER += 2;
+  
+  // Dominance-based adjustments
+  if (b.dominance > 2) scores.CHALLENGER += 2;
+  if (b.dominance < -2) scores.SEEKER += 2;
+  if (b.dominance < -4) scores.SUPPLICANT += 2;
+  if (b.dominance > 4) scores.NARCISSIST += 1;
+  
+  // Question-based
+  if (b.questionCount >= 5) scores.SEEKER += 2;
+  if (b.questionCount <= 2) scores.WALL += 2;
+  
+  // Response pattern-based
+  if (b.responses.deflected > 3) scores.CHALLENGER += 1;
+  if (b.responses.agreed > 3) scores.SUPPLICANT += 2;
+  if (b.responses.countered > 2) scores.TRICKSTER += 1;
+  
+  // Style-based
+  if (domStyle === 'terse' && b.questionCount <= 3) scores.WALL += 2;
+  if (domStyle === 'verbose') scores.OVERFLOWER += 1;
+  
+  // Pick highest score
+  const maxScore = Math.max(...Object.values(scores));
+  const winners = Object.entries(scores).filter(s => s[1] === maxScore).map(s => s[0]);
+  const pick = winners[Math.floor(Math.random() * winners.length)]; // randomize ties
+  
+  const descriptions = {
+    'CHALLENGER': 'THE CHALLENGER — You fight authority. You test boundaries. You need to feel in control.',
+    'SEEKER': 'THE SEEKER — You want to understand. You follow threads. You\'re drawn to mystery.',
+    'NARCISSIST': 'THE NARCISSIST — You made it about yourself. Every answer reflected back to you.',
+    'SUPPLICANT': 'THE SUPPLICANT — You sought approval. You wanted to be told you\'re good.',
+    'TRICKSTER': 'THE TRICKSTER — You didn\'t take it seriously. You deflected with humor. Hard to pin down.',
+    'WALL': 'THE WALL — You gave nothing away. Minimal. Controlled. Hard to read.',
+    'OVERFLOWER': 'THE OVERFLOWER — You couldn\'t help but fill the silence. Words as armor or invitation.'
+  };
+  cls = descriptions[pick] || descriptions['SEEKER'];
   
   const arc = b.emotionalArc.join(' → ');
   
