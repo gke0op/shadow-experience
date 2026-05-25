@@ -169,7 +169,7 @@ h1 .p{color:var(--accent)}
 </div>
 <script>
 const MAX_MSG=10,OR_URL='https://openrouter.ai/api/v1/chat/completions',GEM_URL='https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent';
-const DEF_MODEL_OR='openrouter/owl-alpha',DEF_MODEL_G='gemini-2.5-flash';
+const DEF_MODEL_OR='openrouter/anthropic/claude-sonnet-4',DEF_MODEL_G='gemini-2.5-flash';
 
 // ═══════════════════════════════════════════════════════════════
 // SHADOW'S ADVERSARIAL PROFILING SYSTEM
@@ -530,7 +530,7 @@ async function send(){
     const r=await callAI(isFinal);hideTyping();
     if(r){addMsg('shadow',r);messages.push({role:'assistant',content:r});}
     if(isFinal)setTimeout(showContinueBtn,1500);
-  }catch(e){hideTyping();addMsg('shadow','[The darkness flickers: '+e.message+']');}
+  }catch(e){hideTyping();addMsg('shadow','[The darkness flickers — '+e.message+']');}
 }
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
 
@@ -565,18 +565,34 @@ function restart(){
 async function callAI(isFinal){
   const ctx=buildStrategyContext(messages.filter(m=>m.role==='user').length+1,isFinal);
   const sys=DIRECTOR_SYS+ctx;
-  if(apiType==='openrouter'){
-    const res=await fetch(OR_URL,{method:'POST',headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'},
-      body:JSON.stringify({model:DEF_MODEL_OR,messages:[{role:'system',content:sys},...messages],max_tokens:256,temperature:0.85})});
-    if(!res.ok)throw new Error('OpenRouter '+res.status);
-    const d=await res.json();return d.choices?.[0]?.message?.content||'[SHADOW is silent]';
-  }else{
-    const url=GEM_URL.replace('{m}',DEF_MODEL_G);
-    const gm=messages.map((m,i)=>({role:m.role==='assistant'?'model':'user',parts:[{text:(i===0&&m.role==='user'?sys+'\n\n---\n\n':'')+m.content}]}));
-    const res=await fetch(url+'?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({contents:gm,generationConfig:{temperature:0.85,maxOutputTokens:256}})});
-    if(!res.ok)throw new Error('Gemini '+res.status);
-    const d=await res.json();return d.candidates?.[0]?.content?.parts?.[0]?.text||'[SHADOW is silent]';
+  try{
+    if(apiType==='openrouter'){
+      const res=await fetch(OR_URL,{method:'POST',headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'},
+        body:JSON.stringify({model:DEF_MODEL_OR,messages:[{role:'system',content:sys},...messages],max_tokens:300,temperature:0.85})});
+      if(!res.ok){
+        const errText=await res.text();
+        console.error('OpenRouter error:',res.status,errText);
+        throw new Error('API error '+res.status+': '+errText.slice(0,100));
+      }
+      const d=await res.json();
+      if(d.error)throw new Error(d.error.message||'Unknown API error');
+      return d.choices?.[0]?.message?.content||'[SHADOW is silent]';
+    }else{
+      const url=GEM_URL.replace('{m}',DEF_MODEL_G);
+      const gm=messages.map((m,i)=>({role:m.role==='assistant'?'model':'user',parts:[{text:(i===0&&m.role==='user'?sys+'\n\n---\n\n':'')+m.content}]}));
+      const res=await fetch(url+'?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:gm,generationConfig:{temperature:0.85,maxOutputTokens:300}})});
+      if(!res.ok){
+        const errText=await res.text();
+        console.error('Gemini error:',res.status,errText);
+        throw new Error('API error '+res.status+': '+errText.slice(0,100));
+      }
+      const d=await res.json();
+      return d.candidates?.[0]?.content?.parts?.[0]?.text||'[SHADOW is silent]';
+    }
+  }catch(e){
+    console.error('callAI error:',e);
+    throw e;
   }
 }
 </script>
