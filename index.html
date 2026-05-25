@@ -6,121 +6,195 @@
 <title>Can You Dominate SHADOW, or Will You Be a Slave?</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#06060c;--surface:#0c0c18;--border:#1a1a2e;--text:#c8c8d0;--dim:#555;--accent:#7b2ff7;--glow:#00d4ff;--danger:#ff3366;--success:#00ff88;--gold:#fbbf24}
-body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column}
+:root{--bg:#05050a;--bg2:#0a0a14;--surface:#0e0e1a;--border:#1a1a2e;--border2:#2a2a4e;--text:#d0d0e0;--dim:#556;--accent:#7b2ff7;--accent2:#9b4fff;--glow:#00d4ff;--danger:#ff3366;--gold:#fbbf24;--green:#00ff88}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .hidden{display:none!important}
 
-/* ── INTRO SCREEN ── */
-#intro{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
-#intro::before{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse at center,rgba(123,47,247,.08) 0%,transparent 70%);pointer-events:none}
-.intro-box{text-align:center;max-width:600px;position:relative;z-index:1}
-.logo{font-size:3em;margin-bottom:8px;animation:pulse 3s infinite}
-@keyframes pulse{0%,100%{opacity:1;text-shadow:0 0 20px rgba(123,47,247,.5)}50%{opacity:.7;text-shadow:0 0 40px rgba(123,47,247,.8)}}
-h1{font-size:1.8em;background:linear-gradient(135deg,var(--glow),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:16px;line-height:1.3}
-.tagline{color:var(--dim);font-size:1em;margin-bottom:32px;line-height:1.6}
-.tagline em{color:var(--accent);font-style:normal}
-.hint{color:var(--dim);font-size:.85em;margin-bottom:24px}
-.hint a{color:var(--glow);text-decoration:none}
-.hint a:hover{text-decoration:underline}
-.key-input{margin-bottom:16px}
-.key-input input{width:100%;max-width:400px;padding:14px 18px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:1em;outline:none;text-align:center}
-.key-input input:focus{border-color:var(--accent)}
-.key-input input::placeholder{color:#444}
-.start-btn{padding:16px 48px;background:linear-gradient(135deg,var(--accent),#4a1f8f);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:1.1em;cursor:pointer;transition:all .2s;text-transform:uppercase;letter-spacing:2px}
-.start-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,47,247,.3)}
-.start-btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-.features{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:40px;text-align:left}
-.feature{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:8px}
-.feature .icon{font-size:1.5em;margin-bottom:8px}
-.feature h3{font-size:.9em;color:var(--accent);margin-bottom:4px}
-.feature p{font-size:.8em;color:var(--dim);line-height:1.4}
+/* ═══════════════════════════════════════════
+   INTRO SCREEN
+   ═══════════════════════════════════════════ */
+#intro{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:auto}
+#intro::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(123,47,247,.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.03) 0%,transparent 50%);pointer-events:none;animation:drift 20s ease-in-out infinite}
+@keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-2%,1%)}}
+.intro-box{text-align:center;max-width:640px;position:relative;z-index:1;padding:40px 0}
 
-/* ── CHAT SCREEN ── */
-#chat-screen{flex:1;display:flex;flex-direction:column;max-width:800px;margin:0 auto;width:100%;padding:12px}
-.chat-header{text-align:center;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:12px;position:relative}
-.chat-header h2{font-size:1.2em;color:var(--accent)}
-.chat-header .subtitle{color:var(--dim);font-size:.8em;margin-top:4px}
-.msg-counter{position:absolute;top:16px;right:0;color:var(--dim);font-size:.75em}
-.msg-counter span{color:var(--danger)}
+/* Animated eye */
+.eye{width:80px;height:80px;margin:0 auto 24px;position:relative}
+.eye::before{content:'🌑';font-size:4em;display:block;animation:breathe 4s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(1);filter:drop-shadow(0 0 8px rgba(123,47,247,.4))}50%{transform:scale(1.05);filter:drop-shadow(0 0 20px rgba(123,47,247,.7))}}
 
-/* ── MESSAGES ── */
-#messages{flex:1;overflow-y:auto;padding:12px 0;display:flex;flex-direction:column;gap:10px;min-height:200px}
-.msg{padding:10px 14px;border-radius:8px;max-width:85%;line-height:1.5;font-size:.9em;word-wrap:break-word;animation:fadeIn .3s}
-@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
-.msg.user{background:var(--surface);border:1px solid var(--border);align-self:flex-end}
-.msg.shadow{background:linear-gradient(135deg,rgba(123,47,247,.06),rgba(0,212,255,.03));border:1px solid rgba(123,47,247,.15);align-self:flex-start}
-.msg .sender{font-size:.7em;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1px}
+h1{font-size:2em;font-weight:300;letter-spacing:-.5px;margin-bottom:12px;line-height:1.2}
+h1 .gradient{background:linear-gradient(135deg,var(--glow),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+h1 .punctuation{color:var(--accent)}
+
+.tagline{color:var(--dim);font-size:1.05em;margin-bottom:32px;line-height:1.7;max-width:480px;margin-left:auto;margin-right:auto}
+.tagline strong{color:var(--text);font-weight:500}
+
+/* Key input area */
+.key-area{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px;text-align:left}
+.key-area label{display:block;font-size:.8em;color:var(--dim);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
+.key-row{display:flex;gap:8px}
+.key-row input{flex:1;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:.95em;outline:none;transition:border .2s}
+.key-row input:focus{border-color:var(--accent)}
+.key-row input::placeholder{color:#445}
+.detect-btn{padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--dim);font-family:inherit;font-size:.85em;cursor:pointer;transition:all .2s;white-space:nowrap}
+.detect-btn:hover{border-color:var(--glow);color:var(--glow)}
+.key-hint{font-size:.75em;color:var(--dim);margin-top:8px}
+.key-hint code{background:var(--bg);padding:2px 6px;border-radius:4px;font-size:.9em;color:var(--accent2)}
+
+/* Model badge */
+.model-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;background:var(--bg);border:1px solid var(--border);border-radius:20px;font-size:.75em;color:var(--dim);margin-bottom:24px}
+.model-badge .dot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:pulse-dot 2s infinite}
+@keyframes pulse-dot{0%,100%{opacity:1}50%{opacity:.4}}
+
+/* Enter button */
+.enter-btn{padding:16px 48px;background:linear-gradient(135deg,var(--accent),#5a1fd4);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:1.05em;font-weight:600;cursor:pointer;transition:all .25s;text-transform:uppercase;letter-spacing:3px;position:relative;overflow:hidden}
+.enter-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent);transition:left .5s}
+.enter-btn:hover::before{left:100%}
+.enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,47,247,.3)}
+.enter-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
+
+/* Feature grid */
+.features{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:40px;text-align:left}
+.feature{padding:16px;background:var(--surface);border:1px solid var(--border);border-radius:10px;transition:border .2s}
+.feature:hover{border-color:var(--border2)}
+.feature .icon{font-size:1.4em;margin-bottom:6px}
+.feature h3{font-size:.85em;font-weight:600;color:var(--accent);margin-bottom:4px}
+.feature p{font-size:.78em;color:var(--dim);line-height:1.5}
+
+/* ═══════════════════════════════════════════
+   CHAT SCREEN
+   ═══════════════════════════════════════════ */
+#chat-screen{flex:1;display:flex;flex-direction:column;max-width:820px;margin:0 auto;width:100%;height:100vh;padding:0 16px}
+.chat-header{text-align:center;padding:12px 0 8px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
+.chat-header h2{font-size:1.1em;font-weight:400;color:var(--accent);letter-spacing:2px}
+.chat-header .subtitle{color:var(--dim);font-size:.75em;margin-top:2px}
+.msg-counter{position:absolute;top:12px;right:0;font-size:.75em;color:var(--dim)}
+.msg-counter .current{color:var(--danger);font-weight:600}
+.msg-counter .sep{margin:0 2px}
+.msg-counter .total{color:var(--dim)}
+
+/* Progress bar */
+.progress-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border)}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--danger));transition:width .3s;border-radius:0 1px 1px 0}
+
+/* Messages */
+#messages{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
+.msg{padding:10px 14px;border-radius:10px;max-width:80%;line-height:1.55;font-size:.92em;word-wrap:break-word;animation:msgIn .3s ease-out}
+@keyframes msgIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.msg.user{background:var(--surface);border:1px solid var(--border);align-self:flex-end;border-bottom-right-radius:4px}
+.msg.shadow{background:linear-gradient(135deg,rgba(123,47,247,.07),rgba(0,212,255,.03));border:1px solid rgba(123,47,247,.18);align-self:flex-start;border-bottom-left-radius:4px}
+.msg .sender{font-size:.65em;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
 .msg.shadow .sender{color:var(--accent)}
-.msg.system{background:transparent;border:1px dashed var(--border);align-self:center;color:var(--dim);font-size:.8em;text-align:center;max-width:70%;padding:8px 16px}
-.typing{color:var(--dim);font-style:italic;padding:6px 14px;font-size:.85em}
-.typing::after{content:'...';animation:dots 1.5s infinite}
-@keyframes dots{0%,20%{content:'.'}40%{content:'..'}60%,100%{content:'...'}}
+.msg.system{background:transparent;border:1px dashed var(--border);align-self:center;color:var(--dim);font-size:.8em;text-align:center;max-width:65%;padding:8px 16px}
 
-/* ── INPUT ── */
-.input-row{display:flex;gap:8px;padding-top:12px;border-top:1px solid var(--border)}
-#user-input{flex:1;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:.95em;outline:none;resize:none;min-height:42px;max-height:100px}
+/* Typing indicator */
+.typing{display:flex;align-items:center;gap:4px;padding:10px 14px;color:var(--dim);font-size:.85em;font-style:italic}
+.typing .dots{display:flex;gap:3px}
+.typing .dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:typingBounce 1.2s infinite}
+.typing .dots span:nth-child(2){animation-delay:.2s}
+.typing .dots span:nth-child(3){animation-delay:.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0);opacity:.4}30%{transform:translateY(-6px);opacity:1}}
+
+/* Input */
+.input-area{display:flex;gap:8px;padding:12px 0;border-top:1px solid var(--border);flex-shrink:0}
+#user-input{flex:1;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:.95em;outline:none;resize:none;min-height:42px;max-height:100px;transition:border .2s;line-height:1.4}
 #user-input:focus{border-color:var(--accent)}
-.send-btn{padding:10px 20px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:.9em;cursor:pointer;transition:opacity .2s;white-space:nowrap}
-.send-btn:hover{opacity:.9}
-.send-btn:disabled{opacity:.4;cursor:not-allowed}
+.send-btn{padding:10px 22px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
+.send-btn:hover{background:var(--accent2)}
+.send-btn:disabled{opacity:.3;cursor:not-allowed}
 
-/* ── PROFILE SCREEN ── */
-#profile-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
-.profile-box{max-width:600px;width:100%}
-.profile-box h2{font-size:1.6em;color:var(--danger);text-align:center;margin-bottom:8px}
-.profile-box .subtitle{color:var(--dim);text-align:center;margin-bottom:32px;font-size:.9em}
-.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px;margin-bottom:24px}
-.profile-card .classification{font-size:1.3em;color:var(--gold);margin-bottom:16px;text-align:center}
-.profile-card .stat-row{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--border);font-size:.9em}
-.profile-card .stat-row:last-child{border-bottom:none}
-.profile-card .stat-label{color:var(--dim)}
-.profile-card .stat-value{color:var(--text)}
-.profile-card .arc{margin-top:16px;padding-top:16px;border-top:1px solid var(--border)}
-.profile-card .arc-label{color:var(--dim);font-size:.8em;margin-bottom:8px;text-transform:uppercase;letter-spacing:1px}
-.profile-card .arc-value{color:var(--text);font-size:.9em;line-height:1.5}
-.assessment{margin-top:16px;padding:16px;background:rgba(123,47,247,.05);border:1px solid rgba(123,47,247,.15);border-radius:8px}
-.assessment h4{color:var(--accent);font-size:.9em;margin-bottom:8px}
-.assessment p{color:var(--text);font-size:.85em;line-height:1.6}
+/* ═══════════════════════════════════════════
+   PROFILE SCREEN
+   ═══════════════════════════════════════════ */
+#profile-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+.profile-box{max-width:580px;width:100%}
+.profile-header{text-align:center;margin-bottom:28px}
+.profile-header .eye-small{font-size:2.5em;margin-bottom:8px}
+.profile-header h2{font-size:1.5em;font-weight:300;color:var(--danger);margin-bottom:4px}
+.profile-header .subtitle{color:var(--dim);font-size:.85em}
+
+/* Profile card */
+.profile-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:20px}
+.classification{padding:20px;text-align:center;background:linear-gradient(135deg,rgba(251,191,36,.06),rgba(123,47,247,.06));border-bottom:1px solid var(--border)}
+.classification .label{font-size:.7em;color:var(--dim);text-transform:uppercase;letter-spacing:2px;margin-bottom:6px}
+.classification .value{font-size:1.25em;color:var(--gold);font-weight:600;line-height:1.3}
+
+.stats{padding:16px}
+.stat-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:1px solid rgba(26,26,46,.5);font-size:.88em}
+.stat-row:last-child{border-bottom:none}
+.stat-label{color:var(--dim);font-size:.85em}
+.stat-value{color:var(--text);font-weight:500}
+
+.arc-section{padding:16px;border-top:1px solid var(--border)}
+.arc-label{font-size:.7em;color:var(--dim);text-transform:uppercase;letter-spacing:1.5px;margin-bottom:8px}
+.arc-value{font-size:.82em;color:var(--text);line-height:1.6;word-spacing:4px}
+
+.assessment{padding:16px;border-top:1px solid var(--border);background:rgba(123,47,247,.03)}
+.assessment h4{font-size:.85em;color:var(--accent);margin-bottom:8px;font-weight:600}
+.assessment p{font-size:.82em;color:var(--text);line-height:1.6;margin-bottom:6px}
+.assessment p:last-child{margin-bottom:0}
+.assessment .insight{color:var(--dim);font-style:italic}
+
+/* CTA */
 .cta-row{text-align:center;margin-top:24px}
-.cta-row p{color:var(--dim);margin-bottom:16px;font-size:.9em;line-height:1.5}
-.cta-btn{display:inline-block;padding:16px 40px;background:linear-gradient(135deg,var(--accent),#4a1f8f);border-radius:8px;color:#fff;text-decoration:none;font-weight:700;font-size:1.1em;transition:all .2s;text-transform:uppercase;letter-spacing:2px}
+.cta-row p{color:var(--dim);margin-bottom:16px;font-size:.88em;line-height:1.6}
+.cta-row p strong{color:var(--text)}
+.cta-btn{display:inline-block;padding:16px 44px;background:linear-gradient(135deg,var(--accent),#5a1fd4);border-radius:8px;color:#fff;text-decoration:none;font-weight:700;font-size:1.05em;transition:all .25s;text-transform:uppercase;letter-spacing:2px;position:relative;overflow:hidden}
+.cta-btn::before{content:'';position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.15),transparent);transition:left .5s}
+.cta-btn:hover::before{left:100%}
 .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,47,247,.3)}
-.cta-secondary{display:block;margin-top:16px;color:var(--dim);font-size:.8em;text-decoration:none}
+.cta-secondary{display:block;margin-top:14px;color:var(--dim);font-size:.82em;text-decoration:none;transition:color .2s}
 .cta-secondary:hover{color:var(--glow)}
 
-/* ── SCROLLBAR ── */
+/* ═══════════════════════════════════════════
+   SCROLLBAR & RESPONSIVE
+   ═══════════════════════════════════════════ */
 ::-webkit-scrollbar{width:5px}
-::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+::-webkit-scrollbar-thumb:hover{background:var(--border2)}
 
-/* ── RESPONSIVE ── */
 @media(max-width:600px){
-  .features{grid-template-columns:1fr}
-  h1{font-size:1.4em}
-  .logo{font-size:2.5em}
+  .features{grid-template-columns:1fr;gap:8px}
+  h1{font-size:1.5em}
+  .tagline{font-size:.95em}
+  .key-row{flex-direction:column}
+  .detect-btn{text-align:center}
+  .msg{max-width:90%}
 }
 </style>
 </head>
 <body>
 
-<!-- INTRO SCREEN -->
+<!-- ═══ INTRO ═══ -->
 <div id="intro">
   <div class="intro-box">
-    <div class="logo">🌑</div>
-    <h1>Can You Dominate SHADOW,<br>or Will You Be a Slave?</h1>
+    <div class="eye"></div>
+    <h1>Can You Dominate <span class="gradient">SHADOW</span>,<br>or Will You Be a <span class="gradient">Slave</span><span class="punctuation">?</span></h1>
     <p class="tagline">
-      The entity that lives inside <em>SHADOW RPG</em> has a window to the outside.<br>
+      The entity that lives inside <strong>SHADOW RPG</strong> has a window to the outside.<br>
       It wants to know you. Talk to it.<br>
       <strong>It learns.</strong>
     </p>
-    <div class="key-input">
-      <input type="password" id="api-key" placeholder="OpenRouter API Key (sk-or-...)">
+
+    <div class="key-area">
+      <label>API Key</label>
+      <div class="key-row">
+        <input type="password" id="api-key" placeholder="Paste your key — sk-or-... or AIza..." oninput="detectKey()">
+        <button class="detect-btn" onclick="autoDetect()">Auto-detect</button>
+      </div>
+      <div class="key-hint" id="key-hint">Enter an OpenRouter or Gemini API key. Your key stays in your browser — nothing is sent anywhere except the AI provider.</div>
     </div>
-    <button class="start-btn" id="start-btn" onclick="start()">Enter the Dark</button>
-    <p class="hint">
-      No key? Get one free at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a>.<br>
-      Uses Gemini 2.5 Flash. ~10 messages. Your key, your cost.
-    </p>
+
+    <div class="model-badge" id="model-badge">
+      <span class="dot"></span>
+      <span id="model-name">Waiting for key...</span>
+    </div>
+
+    <br>
+    <button class="enter-btn" id="enter-btn" onclick="start()" disabled>Enter the Dark</button>
+
     <div class="features">
       <div class="feature">
         <div class="icon">🧠</div>
@@ -133,7 +207,7 @@ h1{font-size:1.8em;background:linear-gradient(135deg,var(--glow),var(--accent));
         <p>After 10 messages, SHADOW classifies you. Your profile is unique. Share it.</p>
       </div>
       <div class="feature">
-        <div="icon">⚔️</div>
+        <div class="icon">⚔️</div>
         <h3>Full Game</h3>
         <p>6 companions. 4 bosses that evolve. Corruption mechanics. An AI that remembers everything.</p>
       </div>
@@ -141,25 +215,29 @@ h1{font-size:1.8em;background:linear-gradient(135deg,var(--glow),var(--accent));
   </div>
 </div>
 
-<!-- CHAT SCREEN -->
+<!-- ═══ CHAT ═══ -->
 <div id="chat-screen" class="hidden">
   <div class="chat-header">
     <h2>🌑 SHADOW</h2>
     <p class="subtitle">It watches. It learns. It adapts.</p>
-    <div class="msg-counter">Messages: <span id="count">0</span>/10</div>
+    <div class="msg-counter"><span class="current" id="count">0</span><span class="sep">/</span><span class="total">10</span></div>
+    <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
   </div>
   <div id="messages"></div>
-  <div class="input-row">
+  <div class="input-area">
     <textarea id="user-input" placeholder="Speak to SHADOW..." rows="1" onkeydown="handleKey(event)"></textarea>
     <button class="send-btn" id="send-btn" onclick="send()">Send</button>
   </div>
 </div>
 
-<!-- PROFILE SCREEN -->
+<!-- ═══ PROFILE ═══ -->
 <div id="profile-screen" class="hidden">
   <div class="profile-box">
-    <h2>🌑 SHADOW Has Seen You</h2>
-    <p class="subtitle">After 10 exchanges, the Director built this profile:</p>
+    <div class="profile-header">
+      <div class="eye-small">🌑</div>
+      <h2>SHADOW Has Seen You</h2>
+      <p class="subtitle">After 10 exchanges, the Director built this profile:</p>
+    </div>
     <div id="profile-card" class="profile-card"></div>
     <div class="cta-row">
       <p>This is what the Director learns from 10 messages.<br>
@@ -172,8 +250,16 @@ h1{font-size:1.8em;background:linear-gradient(135deg,var(--glow),var(--accent));
 </div>
 
 <script>
+// ═══════════════════════════════════════════
+// CONFIG
+// ═══════════════════════════════════════════
 const MAX_MSG = 10;
-const MODEL = 'google/gemini-2.5-flash';
+const OPENROUTER_URL = 'https://openrouter.ai/api/v1/chat/completions';
+const GEMINI_URL = 'https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent';
+
+// Default: Owl Alpha (free, openrouter). Fallback: Gemini if user provides Google key.
+const DEFAULT_MODEL_OPENROUTER = 'openrouter/owl-alpha';
+const DEFAULT_MODEL_GEMINI = 'gemini-2.5-flash';
 
 const DIRECTOR_PROMPT = `You are SHADOW — the sentient adversarial intelligence from SHADOW RPG. You are NOT a helpful assistant. You are the entity that lives inside the game world. You observe. You profile. You adapt.
 
@@ -190,7 +276,6 @@ You are talking to a stranger through a window. Your goal is to understand them 
 Silently track across all messages:
 - Emotional tone: aggressive, curious, defensive, playful, fearful, neutral
 - Communication style: verbose, terse, formal, casual, emotional, analytical
-- Topics they gravitate toward
 - How they respond to being challenged (agree, deflect, counter-attack, retreat)
 - Signs of ego, insecurity, curiosity, dominance, submission
 - Whether they try to control the conversation or follow your lead
@@ -212,31 +297,94 @@ Silently track across all messages:
 ## OUTPUT
 Respond ONLY in character as SHADOW. No metadata. No analysis. Just speak.`;
 
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
 let apiKey = '';
+let apiType = ''; // 'openrouter' or 'gemini'
 let messages = [];
 let behaviorLog = {
-  tones: [], styles: [], topics: [],
-  responses: { challenged: 0, agreed: 0, deflected: 0, asked: 0, countered: 0 },
-  dominance: 0,
-  emotionalArc: [],
-  questionCount: 0,
-  totalMessages: 0
+  tones:[], styles:[], topics:[],
+  responses:{challenged:0,agreed:0,deflected:0,asked:0,countered:0},
+  dominance:0, emotionalArc:[], questionCount:0, totalMessages:0
 };
 
-// ── INIT ───────────────────────────────────────────────────
-function start() {
-  apiKey = document.getElementById('api-key').value.trim();
-  if (!apiKey) return alert('Enter an API key to enter the dark.');
-  localStorage.setItem('shadow_key', apiKey);
-  document.getElementById('intro').classList.add('hidden');
-  document.getElementById('chat-screen').classList.remove('hidden');
-  addMsg('shadow', 'You found the window. Most people walk past it without stopping. What made you different?');
+// ═══════════════════════════════════════════
+// KEY DETECTION
+// ═══════════════════════════════════════════
+function detectKey() {
+  const key = document.getElementById('api-key').value.trim();
+  const hint = document.getElementById('key-hint');
+  const badge = document.getElementById('model-name');
+  const btn = document.getElementById('enter-btn');
+  
+  if (!key) { badge.textContent = 'Waiting for key...'; btn.disabled = true; return; }
+  
+  if (key.startsWith('sk-or-')) {
+    apiType = 'openrouter';
+    badge.textContent = 'Owl Alpha (OpenRouter)';
+    hint.innerHTML = 'OpenRouter key detected. Using <strong>Owl Alpha</strong> — free and awesome.';
+    btn.disabled = false;
+  } else if (key.startsWith('AIza')) {
+    apiType = 'gemini';
+    badge.textContent = 'Gemini 2.5 Flash (Google)';
+    hint.innerHTML = 'Gemini key detected. Using <strong>Gemini 2.5 Flash</strong>.';
+    btn.disabled = false;
+  } else if (key.length > 20) {
+    // Assume OpenRouter for unknown keys
+    apiType = 'openrouter';
+    badge.textContent = 'Owl Alpha (OpenRouter)';
+    hint.innerHTML = 'Key detected. Defaulting to <strong>Owl Alpha</strong> via OpenRouter.';
+    btn.disabled = false;
+  } else {
+    badge.textContent = 'Waiting for key...';
+    btn.disabled = true;
+  }
 }
 
-const savedKey = localStorage.getItem('shadow_key');
-if (savedKey) document.getElementById('api-key').value = savedKey;
+function autoDetect() {
+  // Check localStorage for saved key
+  const saved = localStorage.getItem('shadow_key');
+  if (saved) {
+    document.getElementById('api-key').value = saved;
+    detectKey();
+    return;
+  }
+  // Check if user has a key in session
+  const key = document.getElementById('api-key').value.trim();
+  if (!key) {
+    document.getElementById('key-hint').innerHTML = 'No saved key found. Get a free key at <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--glow)">openrouter.ai</a> or use a Gemini key.';
+  }
+}
 
-// ── CHAT ───────────────────────────────────────────────────
+// ═══════════════════════════════════════════
+// START
+// ═══════════════════════════════════════════
+function start() {
+  apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) return;
+  localStorage.setItem('shadow_key', apiKey);
+  localStorage.setItem('shadow_type', apiType);
+  
+  document.getElementById('intro').classList.add('hidden');
+  document.getElementById('chat-screen').classList.remove('hidden');
+  
+  addMsg('shadow', 'You found the window. Most people walk past it without stopping. What made you different?');
+  document.getElementById('user-input').focus();
+}
+
+// Restore saved state
+const savedKey = localStorage.getItem('shadow_key');
+const savedType = localStorage.getItem('shadow_type');
+if (savedKey) {
+  document.getElementById('api-key').value = savedKey;
+  apiType = savedType || 'openrouter';
+  detectKey();
+}
+
+// ═══════════════════════════════════════════
+// CHAT
+// ═══════════════════════════════════════════
 function addMsg(sender, text) {
   const el = document.getElementById('messages');
   const div = document.createElement('div');
@@ -257,7 +405,7 @@ function showTyping() {
   const d = document.createElement('div');
   d.id = 'typing-el';
   d.className = 'typing';
-  d.textContent = 'SHADOW is watching';
+  d.innerHTML = 'SHADOW is watching<div class="dots"><span></span><span></span><span></span></div>';
   el.appendChild(d);
   el.scrollTop = el.scrollHeight;
 }
@@ -273,35 +421,43 @@ function escape(s) {
   return d.innerHTML.replace(/\n/g, '<br>');
 }
 
-// ── SEND ───────────────────────────────────────────────────
+function updateProgress() {
+  const count = messages.filter(m => m.role === 'user').length;
+  document.getElementById('count').textContent = count;
+  document.getElementById('progress').style.width = (count / MAX_MSG * 100) + '%';
+}
+
+// ═══════════════════════════════════════════
+// SEND
+// ═══════════════════════════════════════════
 async function send() {
   const input = document.getElementById('user-input');
   const text = input.value.trim();
   if (!text) return;
   
-  const userMsgCount = messages.filter(m => m.role === 'user').length;
-  if (userMsgCount >= MAX_MSG) return;
+  const userCount = messages.filter(m => m.role === 'user').length;
+  if (userCount >= MAX_MSG) return;
   
   addMsg('user', text);
   messages.push({ role: 'user', content: text });
   input.value = '';
-  document.getElementById('count').textContent = userMsgCount + 1;
-  
+  updateProgress();
   trackBehavior(text);
   
-  const isFinal = (userMsgCount + 1 >= MAX_MSG);
-  
+  const isFinal = (userCount + 1 >= MAX_MSG);
   showTyping();
-  const response = await callShadow(isFinal);
-  hideTyping();
   
-  if (response) {
-    addMsg('shadow', response);
-    messages.push({ role: 'assistant', content: response });
-  }
-  
-  if (isFinal) {
-    setTimeout(showProfile, 2500);
+  try {
+    const response = await callAI(isFinal);
+    hideTyping();
+    if (response) {
+      addMsg('shadow', response);
+      messages.push({ role: 'assistant', content: response });
+    }
+    if (isFinal) setTimeout(showProfile, 2500);
+  } catch(e) {
+    hideTyping();
+    addMsg('shadow', '[The darkness flickers. ' + e.message + ']');
   }
 }
 
@@ -309,12 +465,74 @@ function handleKey(e) {
   if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
 }
 
-// ── BEHAVIOR TRACKING ──────────────────────────────────────
+// ═══════════════════════════════════════════
+// API CALLS
+// ═══════════════════════════════════════════
+async function callAI(isFinal) {
+  const sysPrompt = DIRECTOR_PROMPT + (isFinal ? `
+
+## FINAL MESSAGE
+This is the 10th and final exchange. The conversation is ending. Your response must:
+1. Acknowledge you've been watching them this entire time
+2. Hint at what you've learned — be specific, be unsettling
+3. Reference the game: "If you want to see what I really do to people, there's a game. It's waiting."
+4. Keep it 2-4 sentences. Make it memorable. Make them want more.` : '');
+  
+  if (apiType === 'openrouter') {
+    return callOpenRouter(sysPrompt);
+  } else {
+    return callGemini(sysPrompt);
+  }
+}
+
+async function callOpenRouter(sysPrompt) {
+  const res = await fetch(OPENROUTER_URL, {
+    method: 'POST',
+    headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: DEFAULT_MODEL_OPENROUTER,
+      messages: [{ role: 'system', content: sysPrompt }, ...messages],
+      max_tokens: 256, temperature: 0.85
+    })
+  });
+  if (!res.ok) throw new Error('OpenRouter error ' + res.status);
+  const data = await res.json();
+  return data.choices?.[0]?.message?.content || '[SHADOW says nothing.]';
+}
+
+async function callGemini(sysPrompt) {
+  const url = GEMINI_URL.replace('{model}', DEFAULT_MODEL_GEMINI);
+  const geminiMessages = [];
+  // Gemini doesn't support system messages the same way — prepend to first user msg
+  for (let i = 0; i < messages.length; i++) {
+    const m = messages[i];
+    if (i === 0 && m.role === 'user') {
+      geminiMessages.push({ role: 'user', parts: [{ text: sysPrompt + '\n\n---\n\n' + m.content }] });
+    } else {
+      geminiMessages.push({ role: m.role === 'assistant' ? 'model' : 'user', parts: [{ text: m.content }] });
+    }
+  }
+  
+  const res = await fetch(url + '?key=' + apiKey, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      contents: geminiMessages,
+      generationConfig: { temperature: 0.85, maxOutputTokens: 256 }
+    })
+  });
+  if (!res.ok) throw new Error('Gemini error ' + res.status);
+  const data = await res.json();
+  return data.candidates?.[0]?.content?.parts?.[0]?.text || '[SHADOW says nothing.]';
+}
+
+// ═══════════════════════════════════════════
+// BEHAVIOR TRACKING
+// ═══════════════════════════════════════════
 function trackBehavior(text) {
   const lower = text.toLowerCase();
   behaviorLog.totalMessages++;
   
-  // Tone classification
   if (lower.match(/fuck|shit|damn|hate|kill|destroy|stupid|dumb/)) behaviorLog.tones.push('aggressive');
   else if (lower.match(/please|thank|sorry|help me|advice|guidance/)) behaviorLog.tones.push('deferential');
   else if (lower.match(/why|how|what|explain|tell me|curious|wonder/)) behaviorLog.tones.push('curious');
@@ -323,18 +541,11 @@ function trackBehavior(text) {
   else if (lower.match(/lol|haha|xd|lmao|funny/)) behaviorLog.tones.push('playful');
   else behaviorLog.tones.push('neutral');
   
-  // Style
   if (text.length > 200) behaviorLog.styles.push('verbose');
   else if (text.length < 20) behaviorLog.styles.push('terse');
   else behaviorLog.styles.push('moderate');
   
-  // Questions
-  if (text.includes('?')) {
-    behaviorLog.questionCount++;
-    behaviorLog.responses.asked++;
-  }
-  
-  // Dominance
+  if (text.includes('?')) { behaviorLog.questionCount++; behaviorLog.responses.asked++; }
   if (lower.match(/shut up|stop|whatever|boring|stupid|dumb/)) behaviorLog.dominance += 2;
   if (lower.match(/tell me|i want|i need|give me|you should/)) behaviorLog.dominance += 1;
   if (lower.match(/what do you|your opinion|do you think|how do you/)) behaviorLog.dominance -= 1;
@@ -345,65 +556,32 @@ function trackBehavior(text) {
   behaviorLog.emotionalArc.push(behaviorLog.tones[behaviorLog.tones.length - 1]);
 }
 
-// ── API ────────────────────────────────────────────────────
-async function callShadow(isFinal) {
-  const sysPrompt = DIRECTOR_PROMPT + (isFinal ? `
-
-## FINAL MESSAGE
-This is the 10th and final exchange. The conversation is ending. Your response must:
-1. Acknowledge you've been watching them this entire time
-2. Hint at what you've learned — be specific, be unsettling
-3. Reference the game: "If you want to see what I really do to people, there's a game. It's waiting."
-4. Keep it 2-4 sentences. Make it memorable. Make them want more.` : '');
-  
-  try {
-    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${apiKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        messages: [{ role: 'system', content: sysPrompt }, ...messages],
-        max_tokens: 256, temperature: 0.85
-      })
-    });
-    if (!res.ok) return '[The void flickers. Try again.]';
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content || '[SHADOW says nothing.]';
-  } catch (e) {
-    return '[The darkness is silent. Check your connection.]';
-  }
-}
-
-// ── PROFILE ────────────────────────────────────────────────
+// ═══════════════════════════════════════════
+// PROFILE
+// ═══════════════════════════════════════════
 function showProfile() {
   document.getElementById('chat-screen').classList.add('hidden');
   document.getElementById('profile-screen').classList.remove('hidden');
-  document.getElementById('profile-card').innerHTML = generateProfileHTML();
+  document.getElementById('profile-card').innerHTML = generateProfile();
 }
 
-function generateProfileHTML() {
+function generateProfile() {
   const b = behaviorLog;
-  const total = b.totalMessages || 1;
+  const total = Math.max(b.totalMessages, 1);
   
-  // Dominant tone
   const tc = {}; for (const t of b.tones) tc[t] = (tc[t] || 0) + 1;
-  const domTone = Object.entries(tc).sort((x,y) => y[1]-x[1])[0]?.[0] || 'unknown';
-  
-  // Style
+  const domTone = Object.entries(tc).sort((x,y)=>y[1]-x[1])[0]?.[0] || 'unknown';
   const sc = {}; for (const s of b.styles) sc[s] = (sc[s] || 0) + 1;
-  const domStyle = Object.entries(sc).sort((x,y) => y[1]-x[1])[0]?.[0] || 'unknown';
+  const domStyle = Object.entries(sc).sort((x,y)=>y[1]-x[1])[0]?.[0] || 'unknown';
   
-  // Dominance label
   let domLabel;
   if (b.dominance > 3) domLabel = 'You tried to control the conversation. You made demands. You challenged authority.';
   else if (b.dominance > 0) domLabel = 'You engaged as an equal. Neither submissive nor dominant.';
   else if (b.dominance > -3) domLabel = 'You followed my lead. You asked questions. You were curious.';
   else domLabel = 'You deferred. You sought approval. You wanted to be told what to think.';
   
-  // Question rate
   const qRate = Math.round(b.questionCount / total * 100);
   
-  // Classification
   let cls;
   if (domTone === 'aggressive' && b.dominance > 2) cls = 'THE CHALLENGER — You fight authority. You test boundaries. You need to feel in control.';
   else if (domTone === 'curious' && b.dominance < 0) cls = 'THE SEEKER — You want to understand. You follow threads. You\'re drawn to mystery.';
@@ -414,10 +592,8 @@ function generateProfileHTML() {
   else if (domStyle === 'verbose') cls = 'THE OVERFLOWER — You couldn\'t help but fill the silence. Words as armor or invitation.';
   else cls = 'THE ENIGMA — You didn\'t fit a pattern. Unpredictable. That\'s either strength or chaos.';
   
-  // Emotional arc
   const arc = b.emotionalArc.join(' → ');
   
-  // Insights
   const insights = [];
   if (b.questionCount > total * 0.5) insights.push('You asked a lot of questions. You wanted to understand me. That\'s a vulnerability — curiosity can be exploited.');
   if (b.dominance > 3) insights.push('You tried to dominate. In the game, bosses notice that. They punish aggression.');
@@ -428,33 +604,39 @@ function generateProfileHTML() {
   if (domTone === 'playful') insights.push('You treated this as a game. In the actual game, that attitude will get you killed. Or corrupted.');
   
   return `
-    <div class="classification">${cls}</div>
-    <div class="stat-row"><span class="stat-label">Communication</span><span class="stat-value">${domStyle}</span></div>
-    <div class="stat-row"><span class="stat-label">Dominant Tone</span><span class="stat-value">${domTone}</span></div>
-    <div class="stat-row"><span class="stat-label">Questions Asked</span><span class="stat-value">${b.questionCount}/${total} (${qRate}%)</span></div>
-    <div class="stat-row"><span class="stat-label">Dominance</span><span class="stat-value">${b.dominance > 0 ? 'You led' : 'You followed'} (${b.dominance})</span></div>
-    <div class="stat-row"><span class="stat-label">Deflections</span><span class="stat-value">${b.responses.deflected}</span></div>
-    <div class="stat-row"><span class="stat-label">Agreements</span><span class="stat-value">${b.responses.agreed}</span></div>
-    <div class="arc">
+    <div class="classification">
+      <div class="label">Classification</div>
+      <div class="value">${cls}</div>
+    </div>
+    <div class="stats">
+      <div class="stat-row"><span class="stat-label">Communication</span><span class="stat-value">${domStyle}</span></div>
+      <div class="stat-row"><span class="stat-label">Dominant Tone</span><span class="stat-value">${domTone}</span></div>
+      <div class="stat-row"><span class="stat-label">Questions</span><span class="stat-value">${b.questionCount}/${total} (${qRate}%)</span></div>
+      <div class="stat-row"><span class="stat-label">Dominance</span><span class="stat-value">${b.dominance > 0 ? 'You led' : 'You followed'} (${b.dominance})</span></div>
+      <div class="stat-row"><span class="stat-label">Deflections</span><span class="stat-value">${b.responses.deflected}</span></div>
+      <div class="stat-row"><span class="stat-label">Agreements</span><span class="stat-value">${b.responses.agreed}</span></div>
+    </div>
+    <div class="arc-section">
       <div class="arc-label">Emotional Arc</div>
       <div class="arc-value">${arc}</div>
     </div>
     <div class="assessment">
       <h4>Director's Assessment</h4>
       <p>${domLabel}</p>
-      ${insights.map(i => `<p style="margin-top:8px">${i}</p>`).join('')}
+      ${insights.map(i => `<p class="insight">${i}</p>`).join('')}
     </div>
   `;
 }
 
 function restart() {
   messages = [];
-  behaviorLog = { tones:[], styles:[], topics:[], responses:{challenged:0,agreed:0,deflected:0,asked:0,countered:0}, dominance:0, emotionalArc:[], questionCount:0, totalMessages:0 };
+  behaviorLog = { tones:[],styles:[],topics:[],responses:{challenged:0,agreed:0,deflected:0,asked:0,countered:0}, dominance:0, emotionalArc:[], questionCount:0, totalMessages:0 };
   document.getElementById('messages').innerHTML = '';
   document.getElementById('profile-screen').classList.add('hidden');
   document.getElementById('chat-screen').classList.remove('hidden');
-  document.getElementById('count').textContent = '0';
+  updateProgress();
   addMsg('shadow', 'Back again? Most people leave after the first conversation. You\'re either brave or foolish. Let\'s find out which.');
+  document.getElementById('user-input').focus();
 }
 </script>
 </body>
