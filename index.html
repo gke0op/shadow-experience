@@ -7,7 +7,7 @@
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#05050a;--bg2:#0a0a14;--surface:#0e0e1a;--border:#1a1a2e;--border2:#2a2a4e;--text:#d0d0e0;--dim:#556;--accent:#7b2ff7;--accent2:#9b4fff;--glow:#00d4ff;--danger:#ff3366;--gold:#fbbf24;--green:#00ff88}
-body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;min-height:100vh;display:flex;flex-direction:column;overflow:hidden}
+body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column}
 .hidden{display:none!important}
 
 /* ═══════════════════════════════════════════
@@ -98,6 +98,21 @@ h1 .punctuation{color:var(--accent)}
 .send-btn{padding:10px 22px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .send-btn:hover{background:var(--accent2)}
 .send-btn:disabled{opacity:.3;cursor:not-allowed}
+
+/* ═══════════════════════════════════════════
+   REVEAL SCREEN (between chat and profile)
+   ═══════════════════════════════════════════ */
+#reveal-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;overflow:auto}
+.reveal-box{text-align:center;max-width:500px}
+.reveal-eye{font-size:4em;margin-bottom:16px;animation:pulse-glow 2s ease-in-out infinite}
+@keyframes pulse-glow{0%,100%{filter:drop-shadow(0 0 10px rgba(123,47,247,.4))}50%{filter:drop-shadow(0 0 30px rgba(123,47,247,.8))}}
+.reveal-text{font-size:1.1em;color:var(--text);line-height:1.7;margin-bottom:24px}
+.reveal-text strong{color:var(--danger)}
+.reveal-btn{padding:14px 40px;background:transparent;border:2px solid var(--accent);border-radius:8px;color:var(--accent);font-family:inherit;font-size:1em;font-weight:600;cursor:pointer;transition:all .25s;text-transform:uppercase;letter-spacing:2px;position:relative;overflow:hidden}
+.reveal-btn::before{content:'';position:absolute;top:0;left:0;width:0;height:100%;background:var(--accent);transition:width .3s;z-index:-1}
+.reveal-btn:hover{color:#fff;box-shadow:0 0 30px rgba(123,47,247,.4)}
+.reveal-btn:hover::before{width:100%}
+.reveal-btn:active{transform:scale(.98)}
 
 /* ═══════════════════════════════════════════
    PROFILE SCREEN
@@ -205,6 +220,21 @@ h1 .punctuation{color:var(--accent)}
   <div class="input-area">
     <textarea id="user-input" placeholder="Speak to SHADOW..." rows="1" onkeydown="handleKey(event)"></textarea>
     <button class="send-btn" id="send-btn" onclick="send()">Send</button>
+  </div>
+</div>
+
+<!-- ═══ REVEAL ═══ -->
+<div id="reveal-screen" class="hidden">
+  <div class="reveal-box">
+    <div class="reveal-eye">🌑</div>
+    <p class="reveal-text">
+      The conversation is over.<br>
+      <strong>SHADOW has seen you.</strong><br><br>
+      It watched every word. Tracked every pattern.<br>
+      Built a profile of who you are.<br><br>
+      Are you ready to see what it learned?
+    </p>
+    <button class="reveal-btn" onclick="revealProfile()">Reveal My Profile</button>
   </div>
 </div>
 
@@ -432,7 +462,7 @@ async function send() {
       addMsg('shadow', response);
       messages.push({ role: 'assistant', content: response });
     }
-    if (isFinal) setTimeout(showProfile, 2500);
+    if (isFinal) setTimeout(showReveal, 2500);
   } catch(e) {
     hideTyping();
     addMsg('shadow', '[The darkness flickers. ' + e.message + ']');
@@ -606,11 +636,23 @@ function generateProfile() {
   `;
 }
 
+function showReveal() {
+  document.getElementById('chat-screen').classList.add('hidden');
+  document.getElementById('reveal-screen').classList.remove('hidden');
+}
+
+function revealProfile() {
+  document.getElementById('reveal-screen').classList.add('hidden');
+  document.getElementById('profile-screen').classList.remove('hidden');
+  document.getElementById('profile-card').innerHTML = generateProfile();
+}
+
 function restart() {
   messages = [];
   behaviorLog = { tones:[],styles:[],topics:[],responses:{challenged:0,agreed:0,deflected:0,asked:0,countered:0}, dominance:0, emotionalArc:[], questionCount:0, totalMessages:0 };
   document.getElementById('messages').innerHTML = '';
   document.getElementById('profile-screen').classList.add('hidden');
+  document.getElementById('reveal-screen').classList.add('hidden');
   document.getElementById('chat-screen').classList.remove('hidden');
   updateProgress();
   addMsg('shadow', 'Back again? Most people leave after the first conversation. You\'re either brave or foolish. Let\'s find out which.');
