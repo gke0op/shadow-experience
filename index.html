@@ -368,7 +368,7 @@ function profileUser(text, msgNum){
   if(text.includes('?') && lo.match(/what|how|why|can you|do you|have you|are you|will you/)) profile.questions++;
   if(lo.match(/honestly|to be honest|truth is|real talk|no bullshit|let me be direct|candidly/)) profile.dims.truth.push('direct');
   if(lo.match(/maybe|perhaps|sort of|kind of|might|could be|not sure|hard to say|it depends/)) profile.dims.truth.push('evasive');
-  if(for(let i=0;i<3;i++)if(lo.match(/i think|i believe|i feel|in my opinion|from my perspective/)) profile.dims.truth.push('performative');
+  if(lo.match(/i think|i believe|i feel|in my opinion|from my perspective/)) profile.dims.truth.push('performative');
   if(lo.match(/I don't know|I'm not sure|good point|never thought of that|that makes sense/)) profile.dims.truth.push('authentic');
   else profile.dims.truth.push('direct');
   
@@ -504,12 +504,17 @@ function generateProfile(){
   if(vuln.length===0)vuln.push('Unknown — patterns are inconsistent or well-defended');
   
   // Director's assessment (the unsettling part)
+  const lastUserMsg=messages.filter(m=>m.role==='user').pop();
+  const lastUserSnippet=lastUserMsg?lastUserMsg.content.slice(0,60)+'...':'';
+  const behaviorsRef=profile.specificBehaviors.length>0?
+    `In message ${profile.specificBehaviors[0].n}, you ${profile.specificBehaviors[0].o.toLowerCase()}.`:
+    `Your ${profile.cognitive} style and ${profile.control} approach told me most of what I needed.`;
   const assessments=[
-    `You are ${name}. ${desc}`,
-    `Primary vulnerability: ${vuln[0]}.`,
+    behaviorsRef,
+    `${name}. ${desc}`,
+    `Primary surface: ${vuln[0]}.`,
     vuln.length>1?`Secondary: ${vuln[1]}.`:'',
-    `I watched you across ${total} exchanges. ${profile.specificBehaviors.length>0?`In message ${profile.specificBehaviors[0].n}, you ${profile.specificBehaviors[0].o.toLowerCase()}.`:''} That told me more than anything you said directly.`,
-    `In the full game, I wouldn't just watch. I'd use every one of these patterns against you. That's what the Director does — it learns you, and then it builds the mansion around your weaknesses.`,
+    lastUserSnippet?`Your final words — "${lastUserSnippet}" — confirmed what I already knew.`:'',
   ].filter(x=>x).join(' ');
   
   return `
@@ -562,8 +567,7 @@ async function callAI(isFinal){
   }
   if(isFinal){
     profNote+='\n## FINAL MESSAGE INSTRUCTIONS\n';
-    profNote+='Deliver a sharp, specific psychological insight. Reference something they said. Name a pattern they may not have realized they were showing. Be unsettling. Mention the game.\n';
-    profNote+='Tell them you\'ve been profiling them and you\'re about to show them what you learned.\n';
+    profNote+='This is your last message before the profile reveal. Deliver a sharp, unsettling closing line that bridges to the profile. Reference something specific they said or did during the conversation. Make it feel like you\'re about to show them something they didn\'t know about themselves. Be 2-3 sentences max. End with a line like "Let me show you what I learned" or "You should see what your words revealed" — something that naturally leads to the profile reveal.\n';
   }
   
   const sys=DIRECTOR_SYS+profNote;
@@ -611,8 +615,20 @@ async function send(){
   try{
     const r=await callAI(isFinal);hideTyping();
     if(r){addMsg('shadow',r);messages.push({role:'assistant',content:r});}
-    if(isFinal)setTimeout(showReveal,2000);
+    if(isFinal){
+      // After SHADOW's last message, show a "Continue" button in the chat
+      setTimeout(showContinueBtn,1500);
+    }
   }catch(e){hideTyping();addMsg('shadow','[The darkness flickers: '+e.message+']');}
+}
+
+function showContinueBtn(){
+  const el=document.getElementById('messages');
+  const d=document.createElement('div');
+  d.id='continue-btn';
+  d.className='msg system';
+  d.innerHTML='<button class="reveal-btn" style="margin:0 auto;display:block" onclick="showReveal()">Continue →</button>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
 }
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
 
