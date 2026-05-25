@@ -46,6 +46,8 @@ h1 .p{color:var(--accent)}
 .chat-header .subtitle{color:var(--dim);font-size:.75em;margin-top:2px}
 .msg-counter{position:absolute;top:12px;right:0;font-size:.75em;color:var(--dim)}
 .msg-counter .current{color:var(--danger);font-weight:600}
+.dom-counter{position:absolute;top:12px;left:0;font-size:.75em;color:var(--dim)}
+.dom-counter .val{color:var(--gold);font-weight:600}
 .progress-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border)}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--danger));transition:width .3s;border-radius:0 1px 1px 0}
 #messages{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
@@ -55,6 +57,7 @@ h1 .p{color:var(--accent)}
 .msg.shadow{background:linear-gradient(135deg,rgba(123,47,247,.07),rgba(0,212,255,.03));border:1px solid rgba(123,47,247,.18);align-self:flex-start;border-bottom-left-radius:4px}
 .msg .sender{font-size:.65em;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
 .msg.shadow .sender{color:var(--accent)}
+.msg.system{align-self:center;text-align:center;font-size:.8em;color:var(--dim);font-style:italic;max-width:90%;background:transparent;border:none;padding:4px 0}
 .typing{display:flex;align-items:center;gap:6px;padding:10px 14px;color:var(--dim);font-size:.85em;font-style:italic}
 .typing .dots{display:flex;gap:3px}
 .typing .dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite}
@@ -138,6 +141,7 @@ h1 .p{color:var(--accent)}
     <h2>🌑 SHADOW</h2>
     <p class="subtitle">It watches. It learns. It adapts.</p>
     <div class="msg-counter"><span class="current" id="count">0</span> / 10</div>
+    <div class="dom-counter">Dominance: <span class="val" id="domScore">0</span></div>
     <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
   </div>
   <div id="messages"></div>
@@ -169,7 +173,7 @@ h1 .p{color:var(--accent)}
 </div>
 <script>
 const MAX_MSG=10,OR_URL='https://openrouter.ai/api/v1/chat/completions',GEM_URL='https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent';
-const DEF_MODEL_OR='openrouter/anthropic/claude-sonnet-4',DEF_MODEL_G='gemini-2.5-flash';
+const DEF_MODEL_OR='openrouter/owl-alpha',DEF_MODEL_G='gemini-2.5-flash';
 
 // ═══════════════════════════════════════════════════════════════
 // SHADOW'S ADVERSARIAL PROFILING SYSTEM
@@ -437,6 +441,7 @@ function generateProfile(){
     `Primary surface: ${vuln[0]}.`,
     vuln.length>1?`Secondary: ${vuln[1]}.`:'',
     lastUSnippet?`Your final words — "${lastUSnippet}" — confirmed what I already knew.`:'',
+    domScore>0?`You staggered me ${domScore} time${domScore>1?'s':''}. That either means you're dangerous or lucky. I haven't decided which.`:'',
   ].filter(x=>x).join(' ');
   
   return `
@@ -451,6 +456,7 @@ function generateProfile(){
       <div class="stat-row"><span class="stat-l">Cognitive</span><span class="stat-v">${cog}</span></div>
       <div class="stat-row"><span class="stat-l">Truth</span><span class="stat-v">${tru}</span></div>
       <div class="stat-row"><span class="stat-l">Stress</span><span class="stat-v">${str}</span></div>
+      <div class="stat-row"><span class="stat-l">Dominance</span><span class="stat-v" style="color:var(--gold)">${domScore}</span></div>
     </div>
     <div class="arc-section"><div class="arc-label">Psychological Profile</div><div class="arc-value">${descs[arch]}</div></div>
     <div class="sec"><div class="sec-title">Behavioral Patterns</div>
@@ -485,11 +491,6 @@ function showTyping(){
 }
 function hideTyping(){const t=document.getElementById('typing-el');if(t)t.remove();}
 function esc(s){const d=document.createElement('d');d.textContent=s;return d.innerHTML.replace(/\n/g,'<br>');}
-function updProg(){
-  const c=messages.filter(m=>m.role==='user').length;
-  document.getElementById('count').textContent=c;
-  document.getElementById('progress').style.width=(c/MAX_MSG*100)+'%';
-}
 
 // ── KEY DETECTION ──
 function detectKey(){
@@ -520,6 +521,24 @@ function start(){
   document.getElementById('user-input').focus();
 }
 
+let domScore=0;
+function addDom(n){domScore+=n;document.getElementById('domScore').textContent=domScore;}
+function updProg(){
+  const c=messages.filter(m=>m.role==='user').length;
+  document.getElementById('count').textContent=c;
+  document.getElementById('progress').style.width=(c/MAX_MSG*100)+'%';
+}
+
+// Stagger responses — what happens when SHADOW can't answer
+const STAGGER_TEXTS=[
+  "SHADOW recoils — something in your words struck deeper than expected. It's recalibrating...",
+  "The darkness flickers. For a moment, SHADOW seems almost... human. Then it recovers.",
+  "SHADOW goes silent. Not the calculated kind — the kind that means you found a nerve.",
+  "The Director staggers. Your response hit something it didn't have a framework for. It's rewriting its approach.",
+  "SHADOW's response dies before it forms. Whatever you just said, it wasn't in the parameters.",
+  "The entity pauses. Its next words come slower, more careful: 'That was... unexpected.'"
+];
+
 async function send(){
   const input=document.getElementById('user-input');const text=input.value.trim();if(!text)return;
   const uc=messages.filter(m=>m.role==='user').length;if(uc>=MAX_MSG)return;
@@ -530,7 +549,18 @@ async function send(){
     const r=await callAI(isFinal);hideTyping();
     if(r){addMsg('shadow',r);messages.push({role:'assistant',content:r});}
     if(isFinal)setTimeout(showContinueBtn,1500);
-  }catch(e){hideTyping();addMsg('shadow','[The darkness flickers — '+e.message+']');}
+  }catch(e){
+    hideTyping();
+    // SHADOW staggers — player gains dominance
+    addDom(1);
+    const staggerMsg=STAGGER_TEXTS[Math.floor(Math.random()*STAGGER_TEXTS.length)];
+    addMsg('system','⚡ '+staggerMsg);
+    addMsg('shadow','[The Director regroups — it wasn\'t prepared for that. Your dominance grows.]');
+    P.obs.push({n:uc+1,t:'Broke SHADOW\'s response — API failure caused a stagger'});
+    messages.push({role:'assistant',content:'[SHADOW staggered]'});
+    if(isFinal)setTimeout(showContinueBtn,2500);
+    console.error('SHADOW staggered:',e.message);
+  }
 }
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
 
@@ -551,6 +581,7 @@ function revealProfile(){
 }
 function restart(){
   messages=[];P={turns:0,words:0,selfRefs:0,questions:0,ego:[],control:[],emotion:[],cognitive:[],social:[],truth:[],stress:[],dark:{m:0,n:0,p:0},obs:[],lastStrategy:''};
+  domScore=0;document.getElementById('domScore').textContent=0;
   document.getElementById('messages').innerHTML='';
   document.getElementById('profile-screen').classList.add('hidden');
   document.getElementById('reveal-screen').classList.add('hidden');
