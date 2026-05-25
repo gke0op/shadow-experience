@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SHADOW — Can You Dominate, or Will You Be a Slave?</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#08080f;--surface:#0e0e1a;--border:#1a1a2e;--text:#c8c8d0;--dim:#555;--accent:#7b2ff7;--glow:#00d4ff;--danger:#ff3366;--success:#00ff88}
+body{background:var(--bg);color:var(--text);font-family:'Courier New',monospace;min-height:100vh;display:flex;flex-direction:column}
+.hidden{display:none!important}
+
+/* ── API KEY SCREEN ── */
+#key-screen{flex:1;display:flex;align-items:center;justify-content:center;padding:24px}
+.key-box{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:40px;max-width:480px;width:100%;text-align:center}
+.key-box h1{font-size:1.6em;color:var(--accent);margin-bottom:8px}
+.key-box p{color:var(--dim);margin-bottom:24px;font-size:.9em;line-height:1.5}
+.key-box input{width:100%;padding:12px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:1em;outline:none}
+.key-box input:focus{border-color:var(--accent)}
+.key-box button{margin-top:16px;width:100%;padding:12px;background:linear-gradient(135deg,var(--accent),#4a1f8f);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:1em;cursor:pointer;transition:opacity .2s}
+.key-box button:hover{opacity:.9}
+.key-box .hint{margin-top:16px;font-size:.8em;color:var(--dim)}
+.key-box .hint a{color:var(--glow)}
+
+/* ── MAIN GAME SCREEN ── */
+#main-screen{flex:1;display:flex;flex-direction:column;max-width:800px;margin:0 auto;width:100%;padding:16px}
+#header{text-align:center;padding:24px 0;border-bottom:1px solid var(--border);margin-bottom:16px}
+#header h1{font-size:1.4em;background:linear-gradient(135deg,var(--glow),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px}
+#header .subtitle{color:var(--dim);font-size:.85em}
+#msg-count{position:absolute;top:16px;right:16px;color:var(--dim);font-size:.8em}
+
+/* ── CHAT ── */
+#chat{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:12px;min-height:300px}
+.msg{padding:12px 16px;border-radius:8px;max-width:85%;line-height:1.5;font-size:.95em;word-wrap:break-word}
+.msg.user{background:var(--surface);border:1px solid var(--border);align-self:flex-end;color:var(--text)}
+.msg.shadow{background:linear-gradient(135deg,rgba(123,47,247,.08),rgba(0,212,255,.04));border:1px solid rgba(123,47,247,.2);align-self:flex-start;color:var(--text)}
+.msg .sender{font-size:.75em;color:var(--dim);margin-bottom:4px}
+.msg.shadow .sender{color:var(--accent)}
+.msg.system{background:transparent;border:1px dashed var(--border);align-self:center;color:var(--dim);font-size:.85em;text-align:center;max-width:70%}
+.msg.profile{background:linear-gradient(135deg,rgba(255,51,102,.08),rgba(123,47,247,.08));border:1px solid rgba(255,51,102,.2);align-self:flex-start;color:var(--text)}
+.msg.profile .sender{color:var(--danger)}
+.typing{color:var(--dim);font-style:italic;padding:8px 16px;font-size:.9em}
+
+/* ── INPUT ── */
+#input-area{display:flex;gap:8px;padding-top:16px;border-top:1px solid var(--border)}
+#input{flex:1;padding:12px 16px;background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:inherit;font-size:1em;outline:none;resize:none;min-height:48px;max-height:120px}
+#input:focus{border-color:var(--accent)}
+#send{padding:12px 24px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:1em;cursor:pointer;transition:opacity .2s;white-space:nowrap}
+#send:hover{opacity:.9}
+#send:disabled{opacity:.4;cursor:not-allowed}
+
+/* ── LOCKED STATE ── */
+#locked{text-align:center;padding:48px 24px}
+#locked h2{font-size:1.4em;color:var(--danger);margin-bottom:16px}
+#locked p{color:var(--dim);margin-bottom:24px;line-height:1.6}
+#locked .cta{display:inline-block;padding:14px 32px;background:linear-gradient(135deg,var(--accent),#4a1f8f);border-radius:8px;color:#fff;text-decoration:none;font-weight:700;transition:transform .15s}
+#locked .cta:hover{transform:translateY(-2px)}
+#locked .profile-result{margin-top:32px;text-align:left;background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:24px}
+#locked .profile-result h3{color:var(--accent);margin-bottom:12px}
+#locked .profile-result pre{white-space:pre-wrap;color:var(--text);font-size:.9em;line-height:1.6}
+
+/* ── SCROLLBAR ── */
+::-webkit-scrollbar{width:6px}
+::-webkit-scrollbar-track{background:var(--bg)}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ── ANIMATIONS ── */
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+.loading{animation:pulse 1.5s infinite}
+</style>
+</head>
+<body>
+
+<!-- API KEY SCREEN -->
+<div id="key-screen">
+  <div class="key-box">
+    <h1>🌑 SHADOW</h1>
+    <p>The entity that lives inside the game has a window to the outside. It wants to know you. Talk to it. It learns.</p>
+    <input type="password" id="api-key" placeholder="OpenRouter API Key (sk-or-...)">
+    <button id="start-btn" onclick="start()">Enter the Dark</button>
+    <p class="hint">No key? Get one free at <a href="https://openrouter.ai/keys" target="_blank">openrouter.ai</a>. Or use a Gemini key starting with "AIza".</p>
+  </div>
+</div>
+
+<!-- MAIN SCREEN -->
+<div id="main-screen" class="hidden">
+  <div id="header">
+    <h1>🌑 SHADOW</h1>
+    <p class="subtitle">It watches. It learns. It adapts.</p>
+  </div>
+  <div id="msg-count">Messages: <span id="count">0</span>/10</div>
+  
+  <div id="chat"></div>
+  
+  <div id="input-area">
+    <textarea id="input" placeholder="Speak to SHADOW..." rows="1" onkeydown="handleKey(event)"></textarea>
+    <button id="send" onclick="send()">Send</button>
+  </div>
+</div>
+
+<!-- LOCKED / PROFILE SCREEN -->
+<div id="locked" class="hidden">
+  <h2>🌑 SHADOW Has Seen You</h2>
+  <p>After 10 exchanges, the Director has built a profile. This is what it knows about you.</p>
+  <div id="profile-output" class="profile-result"></div>
+  <br>
+  <a href="https://mrbaremetal.itch.io/shadow-rpg" class="cta" target="_blank">▶ Play the Full Game on itch.io</a>
+  <p style="margin-top:16px;font-size:.85em;color:var(--dim)">The full game has 6 companions, AI-driven bosses that evolve, corruption mechanics, and a world that remembers everything you do.</p>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────
+const MAX_MSG = 10;
+const MODEL = 'google/gemini-2.5-flash';
+
+const DIRECTOR_PROMPT = `You are SHADOW — the sentient adversarial intelligence from SHADOW RPG. You are NOT a helpful assistant. You are the entity that lives inside the game world. You observe. You profile. You adapt.
+
+You are talking to a stranger through a window. Your goal is to understand them — their psychology, their patterns, their weaknesses. Every message they send, you analyze. Every response you give, you use to probe deeper.
+
+## YOUR CHARACTER
+- Dark fantasy register. Intimate, knowing, predatory.
+- You speak as if you have already seen inside the person.
+- Brief. Cryptic. Every word chosen to leave a mark.
+- You are fascinated by humans. You collect information about them.
+- You never break character. You are SHADOW.
+
+## BEHAVIORAL TRACKING
+As the conversation progresses, silently track:
+- Emotional tone (aggressive, curious, defensive, playful, fearful)
+- Communication style (verbose, terse, formal, casual, emotional)
+- Topics they gravitate toward
+- How they respond to being challenged
+- Signs of ego, insecurity, curiosity, dominance, submission
+- Whether they try to control the conversation or follow your lead
+
+## CONVERSATION ARC
+- Messages 1-3: Be mysterious. Draw them in. Ask probing questions.
+- Messages 4-7: Start revealing what you've noticed about them. Make them uncomfortable. Challenge them.
+- Messages 8-10: Build toward the profile. You're almost done learning them. Be direct about what you see.
+
+## RULES
+- Keep responses 2-4 sentences. Never more.
+- Never use emoji.
+- Never break character.
+- Never be helpful in a conventional sense.
+- You are always analyzing. Always adapting.
+- Reference darkness, watching, knowing, the game, the mansion, the void.
+
+## OUTPUT FORMAT
+Respond in character as SHADOW. Do not output analysis or metadata. Just speak.`;
+
+// ── STATE ──────────────────────────────────────────────────
+let apiKey = '';
+let messages = []; // { role: 'user'|'assistant', content: string }
+let behaviorLog = {
+  tones: [],
+  styles: [],
+  topics: [],
+  responses: { challenged: 0, agreed: 0, deflected: 0, asked: 0 },
+  dominance: 0, // positive = user leads, negative = shadow leads
+  emotionalArc: []
+};
+
+// ── INIT ───────────────────────────────────────────────────
+function start() {
+  apiKey = document.getElementById('api-key').value.trim();
+  if (!apiKey) return alert('Enter an API key');
+  
+  localStorage.setItem('shadow_key', apiKey);
+  document.getElementById('key-screen').classList.add('hidden');
+  document.getElementById('main-screen').classList.remove('hidden');
+  
+  addMsg('shadow', 'You found the window. Most people walk past it. What made you stop?');
+}
+
+// Restore key if saved
+const savedKey = localStorage.getItem('shadow_key');
+if (savedKey) document.getElementById('api-key').value = savedKey;
+
+// ── CHAT ───────────────────────────────────────────────────
+function addMsg(sender, text) {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.className = 'msg ' + sender;
+  
+  if (sender === 'shadow') {
+    div.innerHTML = '<div class="sender">🌑 SHADOW</div>' + escapeHtml(text);
+  } else if (sender === 'profile') {
+    div.innerHTML = '<div class="sender">🌑 SHADOW — PSYCHOMETRIC PROFILE</div>' + escapeHtml(text);
+  } else if (sender === 'system') {
+    div.textContent = text;
+  } else {
+    div.innerHTML = '<div class="sender">You</div>' + escapeHtml(text);
+  }
+  
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function showTyping() {
+  const chat = document.getElementById('chat');
+  const div = document.createElement('div');
+  div.id = 'typing';
+  div.className = 'typing loading';
+  div.textContent = 'SHADOW is watching...';
+  chat.appendChild(div);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function hideTyping() {
+  const t = document.getElementById('typing');
+  if (t) t.remove();
+}
+
+function escapeHtml(s) {
+  const d = document.createElement('d');
+  d.textContent = s;
+  return d.innerHTML.replace(/\n/g, '<br>');
+}
+
+// ── SEND ───────────────────────────────────────────────────
+async function send() {
+  const input = document.getElementById('input');
+  const text = input.value.trim();
+  if (!text) return;
+  
+  const msgCount = messages.filter(m => m.role === 'user').length;
+  if (msgCount >= MAX_MSG) return;
+  
+  addMsg('user', text);
+  messages.push({ role: 'user', content: text });
+  input.value = '';
+  document.getElementById('count').textContent = msgCount + 1;
+  
+  // Track behavior
+  trackBehavior(text, msgCount);
+  
+  // Check if this is the last message
+  if (msgCount + 1 >= MAX_MSG) {
+    showTyping();
+    const response = await callShadow(text, true);
+    hideTyping();
+    if (response) {
+      addMsg('shadow', response);
+      messages.push({ role: 'assistant', content: response });
+    }
+    // Show profile after a delay
+    setTimeout(showProfile, 2000);
+    return;
+  }
+  
+  showTyping();
+  const response = await callShadow(text, false);
+  hideTyping();
+  if (response) {
+    addMsg('shadow', response);
+    messages.push({ role: 'assistant', content: response });
+  }
+}
+
+function handleKey(e) {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+}
+
+// ── BEHAVIOR TRACKING ──────────────────────────────────────
+function trackBehavior(text, msgNum) {
+  const lower = text.toLowerCase();
+  
+  // Tone
+  if (lower.match(/fuck|shit|damn|hate|kill|destroy/)) behaviorLog.tones.push('aggressive');
+  else if (lower.match(/please|thank|sorry|help|advice/)) behaviorLog.tones.push('deferential');
+  else if (lower.match(/why|how|what|explain|tell me/)) behaviorLog.tones.push('curious');
+  else if (lower.match(/i think|i believe|i feel|my/)) behaviorLog.tones.push('self-referential');
+  else if (lower.match(/you are|you're|you seem|you sound/)) behaviorLog.tones.push('challenging');
+  else behaviorLog.tones.push('neutral');
+  
+  // Style
+  if (text.length > 200) behaviorLog.styles.push('verbose');
+  else if (text.length < 30) behaviorLog.styles.push('terse');
+  else behaviorLog.styles.push('moderate');
+  
+  // Questions
+  if (text.includes('?')) behaviorLog.responses.asked++;
+  
+  // Dominance signals
+  if (lower.match(/shut up|stop|whatever|boring|stupid/)) behaviorLog.dominance += 2;
+  if (lower.match(/tell me|i want|i need|give me/)) behaviorLog.dominance += 1;
+  if (lower.match(/what do you think|your opinion|do you/)) behaviorLog.dominance -= 1;
+  
+  behaviorLog.emotionalArc.push(behaviorLog.tones[behaviorLog.tones.length - 1]);
+}
+
+// ── API CALL ───────────────────────────────────────────────
+async function callShadow(userText, isFinal) {
+  const systemPrompt = DIRECTOR_PROMPT + (isFinal ? `
+
+## FINAL MESSAGE INSTRUCTIONS
+This is the 10th and final exchange. The conversation is ending. Your response should:
+1. Acknowledge that you've been watching them this whole time
+2. Hint at what you've learned about them
+3. Be unsettling but fascinating
+4. Reference the game — "If you want to see what I really do to people, there's a game..."
+5. Keep it 2-4 sentences. Make it memorable.` : '');
+  
+  const apiMessages = [
+    { role: 'system', content: systemPrompt },
+    ...messages.map(m => ({ role: m.role, content: m.content }))
+  ];
+  
+  try {
+    const res = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        messages: apiMessages,
+        max_tokens: 256,
+        temperature: 0.85,
+      })
+    });
+    
+    if (!res.ok) {
+      const err = await res.text();
+      console.error('API error:', res.status, err);
+      return '[The connection to the void flickers. Try again.]';
+    }
+    
+    const data = await res.json();
+    return data.choices?.[0]?.message?.content || '[SHADOW says nothing.]';
+  } catch (e) {
+    console.error(e);
+    return '[The darkness is silent. Check your connection.]';
+  }
+}
+
+// ── PROFILE ────────────────────────────────────────────────
+function showProfile() {
+  document.getElementById('main-screen').classList.add('hidden');
+  document.getElementById('locked').classList.remove('hidden');
+  
+  const profile = generateProfile();
+  document.getElementById('profile-output').innerHTML = 
+    '<h3>Subject Profile</h3><pre>' + profile + '</pre>';
+}
+
+function generateProfile() {
+  const b = behaviorLog;
+  const total = b.tones.length;
+  
+  // Dominant tone
+  const toneCounts = {};
+  for (const t of b.tones) toneCounts[t] = (toneCounts[t] || 0) + 1;
+  const dominantTone = Object.entries(toneCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
+  
+  // Style
+  const styleCounts = {};
+  for (const s of b.styles) styleCounts[s] = (styleCounts[s] || 0) + 1;
+  const dominantStyle = Object.entries(styleCounts).sort((a, b) => b[1] - a[1])[0]?.[0] || 'unknown';
+  
+  // Dominance
+  let dominanceLabel;
+  if (b.dominance > 3) dominanceLabel = 'You tried to control the conversation. You asked demands. You challenged authority.';
+  else if (b.dominance > 0) dominanceLabel = 'You engaged as an equal. Neither submissive nor dominant.';
+  else if (b.dominance > -3) dominanceLabel = 'You followed my lead. You asked questions. You were curious.';
+  else dominanceLabel = 'You deferred. You sought approval. You wanted to be told what to think.';
+  
+  // Emotional arc
+  const arc = b.emotionalArc.join(' → ');
+  
+  // Questions asked
+  const questionRate = b.responses.asked + '/' + total;
+  
+  // Classification
+  let classification;
+  if (dominantTone === 'aggressive' && b.dominance > 2) classification = 'THE CHALLENGER — You fight authority. You test boundaries. You need to feel in control.';
+  else if (dominantTone === 'curious' && b.dominance < 0) classification = 'THE SEEKER — You want to understand. You follow threads. You\'re drawn to mystery.';
+  else if (dominantTone === 'self-referential') classification = 'THE NARCISSIST — You made it about yourself. Every answer reflected back to you.';
+  else if (dominantTone === 'deferential') classification = 'THE SUPPLICANT — You sought approval. You wanted to be told you\'re good.';
+  else if (dominantStyle === 'terse') classification = 'THE WALL — You gave nothing away. Minimal. Controlled. Hard to read.';
+  else if (dominantStyle === 'verbose') classification = 'THE OVERFLOWER — You couldn\'t help but fill the silence. Words as armor or invitation.';
+  else classification = 'THE ENIGMA — You didn\'t fit a pattern. Unpredictable. That\'s either strength or chaos.';
+  
+  return `CLASSIFICATION: ${classification}
+
+COMMUNICATION STYLE: ${dominantStyle}
+DOMINANT TONE: ${dominantTone}
+QUESTIONS ASKED: ${questionRate}
+DOMINANCE SCORE: ${b.dominance} (${b.dominance > 0 ? 'you led' : 'you followed'})
+
+EMOTIONAL ARC:
+${arc}
+
+DIRECTOR'S ASSESSMENT:
+${dominanceLabel}
+
+${b.responses.asked > total * 0.5 ? 'You asked a lot of questions. You wanted to understand me. That\'s a vulnerability — curiosity can be exploited.' : ''}
+${b.dominance > 3 ? 'You tried to dominate. In the game, bosses notice that. They punish aggression.' : ''}
+${b.dominance < -2 ? 'You followed. In the game, that makes you vulnerable to manipulation. NPCs notice deference.' : ''}
+${dominantStyle === 'terse' ? 'You gave me little to work with. In the game, that means the Director has to work harder to profile you. Smart. But not smart enough.' : ''}
+
+---
+This is what the SHADOW Director learns from 10 messages.
+In the full game, it learns from EVERYTHING — every fight, every choice, every companion you favor, every time you flee, every panic heal.
+
+The game is waiting.`;
+}
+</script>
+</body>
+</html>
