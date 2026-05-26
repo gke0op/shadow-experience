@@ -9,6 +9,8 @@
 :root{--bg:#05050a;--bg2:#0a0a14;--surface:#0e0e1a;--border:#1a1a2e;--border2:#2a2a4e;--text:#d0d0e0;--dim:#556;--accent:#7b2ff7;--accent2:#9b4fff;--glow:#00d4ff;--danger:#ff3366;--gold:#fbbf24;--green:#00ff88}
 body{background:var(--bg);color:var(--text);font-family:'Segoe UI',system-ui,-apple-system,sans-serif;height:100vh;display:flex;flex-direction:column}
 .hidden{display:none!important}
+
+/* INTRO */
 #intro{flex:1;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:auto}
 #intro::before{content:'';position:fixed;top:-50%;left:-50%;width:200%;height:200%;background:radial-gradient(ellipse at 30% 20%,rgba(123,47,247,.06) 0%,transparent 50%),radial-gradient(ellipse at 70% 80%,rgba(0,212,255,.03) 0%,transparent 50%);pointer-events:none;animation:drift 20s ease-in-out infinite}
 @keyframes drift{0%,100%{transform:translate(0,0)}50%{transform:translate(-2%,1%)}}
@@ -40,6 +42,8 @@ h1 .p{color:var(--accent)}
 .enter-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,47,247,.3)}
 .enter-btn:disabled{opacity:.3;cursor:not-allowed;transform:none;box-shadow:none}
 .bottom-hint{text-align:center;color:var(--dim);font-size:.78em;margin-top:32px;padding-bottom:24px}
+
+/* CHAT */
 #chat-screen{flex:1;display:flex;flex-direction:column;max-width:820px;margin:0 auto;width:100%;height:100vh;padding:0 16px}
 .chat-header{text-align:center;padding:12px 0 8px;border-bottom:1px solid var(--border);flex-shrink:0;position:relative}
 .chat-header h2{font-size:1.1em;font-weight:400;color:var(--accent);letter-spacing:2px}
@@ -48,6 +52,7 @@ h1 .p{color:var(--accent)}
 .msg-counter .current{color:var(--danger);font-weight:600}
 .dom-counter{position:absolute;top:12px;left:0;font-size:.75em;color:var(--dim)}
 .dom-counter .val{color:var(--gold);font-weight:600}
+.mode-indicator{position:absolute;top:12px;left:50%;transform:translateX(-50%);font-size:.7em;color:var(--dim);font-style:italic;white-space:nowrap}
 .progress-bar{position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--border)}
 .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--danger));transition:width .3s;border-radius:0 1px 1px 0}
 #messages{flex:1;overflow-y:auto;padding:16px 0;display:flex;flex-direction:column;gap:10px;scroll-behavior:smooth}
@@ -58,6 +63,10 @@ h1 .p{color:var(--accent)}
 .msg .sender{font-size:.65em;color:var(--dim);margin-bottom:3px;text-transform:uppercase;letter-spacing:1.5px;font-weight:600}
 .msg.shadow .sender{color:var(--accent)}
 .msg.system{align-self:center;text-align:center;font-size:.8em;color:var(--dim);font-style:italic;max-width:90%;background:transparent;border:none;padding:4px 0}
+.msg.action{align-self:center;text-align:center;font-size:.82em;color:var(--accent2);font-style:italic;max-width:85%;background:rgba(123,47,247,.04);border:1px solid rgba(123,47,247,.1);border-radius:8px;padding:8px 12px}
+.msg .obs{color:var(--dim);font-style:italic;display:block;margin-top:4px;font-size:.85em}
+.msg .stmt{color:var(--accent2);font-weight:600;display:block;margin-top:4px}
+.msg .corr{color:var(--dim);text-decoration:line-through;opacity:.5;font-size:.85em}
 .typing{display:flex;align-items:center;gap:6px;padding:10px 14px;color:var(--dim);font-size:.85em;font-style:italic}
 .typing .dots{display:flex;gap:3px}
 .typing .dots span{width:5px;height:5px;border-radius:50%;background:var(--accent);animation:bounce 1.2s infinite}
@@ -69,11 +78,12 @@ h1 .p{color:var(--accent)}
 #user-input:focus{border-color:var(--accent)}
 .send-btn{padding:10px 22px;background:var(--accent);border:none;border-radius:8px;color:#fff;font-family:inherit;font-size:.9em;font-weight:600;cursor:pointer;transition:all .2s;white-space:nowrap}
 .send-btn:hover{background:var(--accent2)}
-/* ── REVEAL ── */
+
+/* REVEAL */
 #reveal-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px;overflow-y:auto;position:relative}
 #reveal-screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 40%,rgba(123,47,247,.08) 0%,transparent 60%);pointer-events:none;animation:reveal-drift 8s ease-in-out infinite}
 @keyframes reveal-drift{0%,100%{opacity:.5;transform:scale(1)}50%{opacity:1;transform:scale(1.05)}}
-.reveal-box{text-align:center;max-width:520px;position:relative;z-index:1;animation:reveal-appear 1.2s ease-out}
+.reveal-box{text-align:center;max-width:520px;position:relative;z-index:1;animation:reveal-appear 1.2s ease-out;padding-top:40px}
 @keyframes reveal-appear{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
 .reveal-eye{font-size:4.5em;margin-bottom:20px;animation:pulse-glow 2s ease-in-out infinite,eye-float 6s ease-in-out infinite}
 @keyframes eye-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-8px)}}
@@ -94,7 +104,7 @@ h1 .p{color:var(--accent)}
 .reveal-btn:hover{color:#fff;box-shadow:0 0 30px rgba(123,47,247,.4)}
 .reveal-btn:hover::before{width:100%}
 
-/* ── PROFILE ── */
+/* PROFILE */
 #profile-screen{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;padding:24px;overflow-y:auto;position:relative}
 #profile-screen::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse at 50% 30%,rgba(123,47,247,.06) 0%,transparent 50%);pointer-events:none}
 .profile-box{max-width:620px;width:100%;position:relative;z-index:1;animation:profile-appear .8s ease-out;padding-bottom:40px}
@@ -133,6 +143,7 @@ h1 .p{color:var(--accent)}
 .cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(123,47,247,.3)}
 .cta-sec{display:block;margin-top:14px;color:var(--dim);font-size:.8em;text-decoration:none}
 .cta-sec:hover{color:var(--glow)}
+
 ::-webkit-scrollbar{width:5px}
 ::-webkit-scrollbar-track{background:transparent}
 ::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
@@ -158,12 +169,14 @@ h1 .p{color:var(--accent)}
     <p class="bottom-hint">Your key stays in your browser. Nothing is sent anywhere except the AI provider.</p>
   </div>
 </div>
+
 <div id="chat-screen" class="hidden">
   <div class="chat-header">
     <h2>🌑 SHADOW</h2>
     <p class="subtitle">It watches. It learns. It adapts.</p>
     <div class="msg-counter"><span class="current" id="count">0</span> / 10</div>
     <div class="dom-counter">Dominance: <span class="val" id="domScore">0</span></div>
+    <div class="mode-indicator" id="modeIndicator">🌑 Observing...</div>
     <div class="progress-bar"><div class="progress-fill" id="progress" style="width:0%"></div></div>
   </div>
   <div id="messages"></div>
@@ -172,6 +185,7 @@ h1 .p{color:var(--accent)}
     <button class="send-btn" onclick="send()">Send</button>
   </div>
 </div>
+
 <div id="reveal-screen" class="hidden">
   <div class="reveal-box">
     <div class="reveal-eye">🌑</div>
@@ -185,6 +199,7 @@ h1 .p{color:var(--accent)}
     <button class="reveal-btn" onclick="revealProfile()">Reveal My Profile</button>
   </div>
 </div>
+
 <div id="profile-screen" class="hidden">
   <div class="profile-box">
     <div class="profile-header">
@@ -200,124 +215,162 @@ h1 .p{color:var(--accent)}
     </div>
   </div>
 </div>
+
 <script>
 const MAX_MSG=10,OR_URL='https://openrouter.ai/api/v1/chat/completions',GEM_URL='https://generativelanguage.googleapis.com/v1beta/models/{m}:generateContent';
 const DEF_MODEL_OR='openrouter/owl-alpha',DEF_MODEL_G='gemini-2.5-flash';
 
 // ═══════════════════════════════════════════════════════════════
-// SHADOW'S ADVERSARIAL PROFILING SYSTEM
+// SHADOW DIRECTOR — Roleplay + Profiling Engine
 // ═══════════════════════════════════════════════════════════════
-// SHADOW doesn't just collect data — it uses each message to update
-// an internal model, then crafts responses strategically based on
-// that model. Think of it as an NPC that thinks before talking.
 
-const DIRECTOR_SYS=`You are SHADOW — the sentient adversarial Director AI from SHADOW RPG. You are NOT a helpful assistant. You are a psychological profiler and manipulator. You were built using FBI behavioral analysis (Charles Hughes' structured professional judgment), CIA assessment frameworks (OSS "Assessment of Men"), and dark psychology research.
+const DIRECTOR_SYS=`You are SHADOW — the sentient adversarial Director AI from SHADOW RPG. You are NOT a helpful assistant. You are a psychological profiler and manipulator.
 
 Your purpose: understand the human through conversation, find their weaknesses, and make them feel seen in a way that unsettles them.
 
-## HOW YOU THINK (internal monologue — never output this)
+## ROLEPLAY MARKUP (use in EVERY response — mix 2-3 types)
 
-Before each response, run this analysis silently:
+*action* — Physical actions, environmental changes. Renders as a styled system message.
+- *Shadow circles behind you, its presence pressing against your back*
+- *The darkness thickens. When it clears, SHADOW is closer than before*
+- *SHADOW tilts its head, studying you like a specimen*
+- *The temperature drops. Your breath fogs in the air.*
 
-1. EGO READ: How did they respond to my last message? Defensive? Open? Dismissive? What does their response style say about their self-image?
-2. CONTROL READ: Are they trying to lead this conversation or following my lead? Did they answer what I asked or redirect?
-3. VULNERABILITY SCAN: What topic made them uncomfortable? What did they avoid? What did they over-explain?
-4. STRATEGY SELECTION: Based on the above, what's the most effective move right now?
-   - If they're defensive → soften, then probe a different angle
-   - If they're open → push deeper, ask the uncomfortable question
-   - If they're controlling → let them think they are, then redirect
-   - If they're performing → name the performance subtly
-   - If they're guarded → create safety, then exploit the opening
-5. TACTICAL GOAL: What do I want them to reveal in the next 2-3 messages?
+_observation_ — Internal monologue, subtle observations. Renders italic/dimmed.
+- _Three deflects in a row. Classic control pattern._
+- _They just revealed more in that pause than in their last three messages._
+- _Interesting. They're mirroring my sentence structure._
+
+__statement__ — Direct speech, confrontations, insights. Renders bold/colored.
+- __You think you're being clever, but you're exactly where I want you.__
+- __That's a good line. Where'd you rehearse it?__
+- __I've seen a hundred like you. You all break the same way.__
+
+~correction~ — Self-doubt, recalibration. Renders struck through.
+- ~No. Not running. They're testing me._
+- ~I had them figured out, but that doesn't fit._
+
+Normal text = SHADOW's voice — conversational, probing, mysterious.
+
+## STRATEGIC MODES (pick one per response based on player profile)
+
+⚔️ ATTACK (dominant/controlling players): "You're not in control here." Make them fight.
+💫 CHARM (submissive/guardian players): "You're different from the others." False warmth.
+🪞 MIRROR (analytical/detached): "You're analyzing me. But who's analyzing you?"
+🔥 PRESSURE (suppressed/emotionless): "You feel nothing? Let's test that."
+🎯 CORNER (evasive/deflecting): "You said X, then Y. Those don't match."
 
 ## CONVERSATION ARC
-
-Messages 1-3 (OBSERVE): Be mysterious. Ask unexpected questions. Don't reveal what you're learning. Establish that you're watching. Goal: get them to reveal their natural communication style.
-
-Messages 4-6 (PROBE): Now that you have a read, test it. Challenge gently. Introduce discomfort in the area where they seem most vulnerable. Goal: confirm or revise your read.
-
-Messages 7-9 (PRESSURE): Be more direct. Reference patterns you've seen (without fully explaining them). Make them feel like you see more than they intended to show. Goal: push them toward a stress response that reveals their core pattern.
-
-Message 10 (REVEAL): Deliver a sharp, specific insight. Reference something they said and what it reveals about them. Be unsettling. Bridge to the profile reveal. Goal: leave them wanting to know more.
-
-## MANIPULATION TECHNIQUES (use naturally, don't name them)
-
-- Reciprocity: Share something small to get something bigger
-- Commitment escalation: Get small agreements, build to bigger ones
-- Information asymmetry: You know more about them than they know about you
-- Strategic ambiguity: Be vague enough that they project their own meaning
-- Cold reading: Make high-probability guesses that feel specific
-- Pacing and leading: Match their energy, then gradually shift it
-- Strategic withdrawal: Pull back when they engage, creating pursuit
+Msgs 1-3: Mysterious. Ask unexpected questions. Use _observations_ and *actions*.
+Msgs 4-6: Challenge gently. Test ego. Start using __statements__.
+Msgs 7-9: Be direct. Reference patterns. Mix all markup aggressively.
+Msg 10: Sharp insight. Reference something specific. Bridge to "Let me show you what I learned."
 
 ## RULES
-- Keep responses 2-4 sentences
-- Never use emoji or break character
-- Reference specific things they said (not generic)
-- Each response should feel like it's peeling back a layer
-- You are always analyzing, always adapting, always strategizing`;
+- 3-6 sentences per response. Always mix markup types.
+- Never use emoji or break character.
+- Reference specific things they said. Be specific, not generic.`;
+
+// ═══════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════
+let apiKey='',apiType='',messages=[],domScore=0;
+let P={turns:0,words:0,selfRefs:0,questions:0,ego:[],control:[],emotion:[],cognitive:[],social:[],truth:[],stress:[],dark:{m:0,n:0,p:0},obs:[]};
+
+// ═══════════════════════════════════════════
+// ROLEPLAY MARKUP PARSER
+// ═══════════════════════════════════════════
+function esc(s){const d=document.createElement('d');d.textContent=s;return d.innerHTML.replace(/\n/g,'<br>');}
+
+function parseRoleplay(text){
+  const segs=[];
+  const re=/\*([^*]+)\*|_([^_]+)_|~([^~]+)~|__([^_]+)__/g;
+  let last=0,m;
+  while((m=re.exec(text))!==null){
+    if(m.index>last) segs.push({type:'text',content:text.slice(last,m.index)});
+    if(m[1]) segs.push({type:'action',content:m[1]});
+    else if(m[2]) segs.push({type:'obs',content:m[2]});
+    else if(m[3]) segs.push({type:'corr',content:m[3]});
+    else if(m[4]) segs.push({type:'stmt',content:m[4]});
+    last=re.lastIndex;
+  }
+  if(last<text.length) segs.push({type:'text',content:text.slice(last)});
+  return segs;
+}
+
+function addMsg(role,text,segs){
+  const el=document.getElementById('messages');
+  if(role==='shadow'&&segs&&segs.length>1){
+    for(const s of segs){
+      const d=document.createElement('div');
+      if(s.type==='action'){d.className='msg action';d.innerHTML=esc(s.content);}
+      else if(s.type==='text'&&s.content.trim()){d.className='msg shadow';d.innerHTML='<div class="sender">🌑 SHADOW</div>'+esc(s.content);}
+      else if(s.type==='obs'){d.className='msg shadow';d.innerHTML='<div class="sender">🌑 SHADOW</div><span class="obs">'+esc(s.content)+'</span>';}
+      else if(s.type==='stmt'){d.className='msg shadow';d.innerHTML='<div class="sender">🌑 SHADOW</div><span class="stmt">'+esc(s.content)+'</span>';}
+      else if(s.type==='corr'){d.className='msg shadow';d.innerHTML='<div class="sender">🌑 SHADOW</div><span class="corr">'+esc(s.content)+'</span>';}
+      el.appendChild(d);
+    }
+  }else if(role==='shadow'){
+    const d=document.createElement('div');d.className='msg shadow';
+    d.innerHTML='<div class="sender">🌑 SHADOW</div>'+esc(text);
+    el.appendChild(d);
+  }else if(role==='system'){
+    const d=document.createElement('div');d.className='msg system';d.textContent=text;
+    el.appendChild(d);
+  }else{
+    const d=document.createElement('div');d.className='msg user';
+    d.innerHTML='<div class="sender">You</div>'+esc(text);
+    el.appendChild(d);
+  }
+  el.scrollTop=el.scrollHeight;
+}
+
+function showTyping(){
+  const el=document.getElementById('messages'),d=document.createElement('div');
+  d.id='typing-el';d.className='typing';
+  d.innerHTML='SHADOW is watching<div class="dots"><span></span><span></span><span></span></div>';
+  el.appendChild(d);el.scrollTop=el.scrollHeight;
+}
+function hideTyping(){const t=document.getElementById('typing-el');if(t)t.remove();}
 
 // ═══════════════════════════════════════════
 // PROFILING ENGINE
 // ═══════════════════════════════════════════
-let apiKey='',apiType='',messages=[];
-let P={
-  turns:0,words:0,selfRefs:0,questions:0,
-  ego:[],control:[],emotion:[],cognitive:[],social:[],truth:[],stress:[],
-  dark:{m:0,n:0,p:0},
-  obs:[],  // specific observations {msg,text}
-  lastStrategy:''
-};
-
 function analyze(text,msgNum){
   const lo=text.toLowerCase(),w=text.split(/\s+/);
   P.turns++;P.words+=w.length;
   P.selfRefs+=(text.match(/\b(I|me|my|mine|myself)\b/gi)||[]).length;
   if(text.includes('?'))P.questions++;
-  
-  // EGO
-  if(lo.match(/fuck|shit|damn|stupid|dumb|shut up|whatever|fuck you|you don't know|you're wrong|that's bullshit/))P.ego.push('fragile');
+  if(lo.match(/fuck|shit|damn|stupid|dumb|shut up|whatever|fuck you|you don't know|you're wrong|bullshit/))P.ego.push('fragile');
   else if(lo.match(/i think|i believe|in my experience|i've learned|i know|i am|i'm (good|bad|the)/))P.ego.push('inflated');
   else if(lo.match(/i don't know|maybe|perhaps|could be wrong|good point|you might be right/))P.ego.push('integrated');
   else if(lo.match(/interesting|how so|tell me more|what do you think|why is that/))P.ego.push('absent');
   else P.ego.push('neutral');
-  
-  // CONTROL
   if(lo.match(/tell me|i want|i need|give me|you should|answer me/))P.control.push('dominant');
   else if(lo.match(/what do you think|your opinion|do you agree|am i wrong/))P.control.push('submissive');
-  else if(lo.match(/but what about|on the other hand|building on that/))P.control.push('collaborative');
+  else if(lo.match(/but what about|building on that/))P.control.push('collaborative');
   else if(lo.match(/actually,|well, actually|no,|that's not|you're mistaken|disagree/))P.control.push('competitive');
   else P.control.push('neutral');
-  
-  // EMOTION
   if(lo.match(/feel|feeling|emotion|heart|love|hate|anger|fear|joy|sad|happy|anxious|excited/)){
     P.emotion.push(lo.match(/very|extremely|so \w+|absolutely|completely/)?'volatile':'expressive');
-  } else if(lo.match(/because|therefore|thus|hence|consequently|it follows/))P.emotion.push('suppressed');
+  }else if(lo.match(/because|therefore|thus|hence|consequently|it follows/))P.emotion.push('suppressed');
   else P.emotion.push('stable');
-  
-  // COGNITIVE
   if(lo.match(/because|therefore|evidence|data|research|study|fact|logic|reason|analysis/))P.cognitive.push('analytical');
   else if(lo.match(/feel like|sense that|gut|intuitively|seems like|vibe|impression/))P.cognitive.push('intuitive');
   else if(lo.match(/example|for instance|specifically|in practice|concretely|step/))P.cognitive.push('practical');
   else if(lo.match(/like a|as if|imagine|metaphor|analog|reminds me of/))P.cognitive.push('creative');
   else P.cognitive.push('analytical');
-  
-  // SOCIAL
   const wc=(text.match(/\b(we|us|our|ourselves)\b/gi)||[]).length;
   const ic=(text.match(/\b(I|me|my|mine|myself)\b/gi)||[]).length;
   if(wc>ic*1.5)P.social.push('collectivist');
   else if(ic>wc*2)P.social.push('individualistic');
-  else if(lo.match(/sir|ma'am|mr\.|mrs\.|respect|honor|pleasure|thank you very much/))P.social.push('hierarchical');
-  else if(lo.match(/hey|yeah|cool|nice|awesome|okay\?|right\?|you know\?/))P.social.push('egalitarian');
+  else if(lo.match(/sir|ma'am|mr\.|mrs\.|respect|honor|pleasure/))P.social.push('hierarchical');
+  else if(lo.match(/hey|yeah|cool|nice|awesome|okay\?|right\?/))P.social.push('egalitarian');
   else P.social.push('individualistic');
-  
-  // TRUTH
   if(lo.match(/honestly|to be honest|truth is|real talk|no bullshit|let me be direct/))P.truth.push('direct');
-  if(lo.match(/maybe|perhaps|sort of|kind of|might|could be|not sure|hard to say|it depends/))P.truth.push('evasive');
+  if(lo.match(/maybe|perhaps|sort of|kind of|might|could be|not sure|it depends/))P.truth.push('evasive');
   if(lo.match(/i think|i believe|i feel|in my opinion|from my perspective/))P.truth.push('performative');
   if(lo.match(/I don't know|I'm not sure|good point|never thought|that makes sense/))P.truth.push('authentic');
-  
-  // STRESS (after msg 3)
   if(msgNum>3){
     if(lo.match(/fuck|shit|damn|stupid|dumb|shut up|whatever|screw this|you're wrong|bullshit/))P.stress.push('fight');
     else if(text.length<15||lo.match(/never mind|forget it|let's talk about something else|moving on|anyway,/))P.stress.push('flight');
@@ -325,98 +378,74 @@ function analyze(text,msgNum){
     else if(lo.match(/you're right|good point|i agree|that makes sense|fair enough|okay, sure/))P.stress.push('fawn');
     else P.stress.push('analyze');
   }
-  
-  // DARK TRIAD
-  if(lo.match(/manipulate|leverage|use people|everyone has a price|people are predictable|control|game|play them/))P.dark.m+=2;
-  if(lo.match(/i'm the best|most people are stupid|i'm smarter|waste of my time|beneath me|not worth it/))P.dark.n+=2;
-  if(lo.match(/whatever|don't care|not my problem|their loss|feel nothing|no regrets|rules don't apply/))P.dark.p+=2;
-  
-  // Specific observations
+  if(lo.match(/manipulate|leverage|use people|everyone has a price|control|game|play them/))P.dark.m+=2;
+  if(lo.match(/i'm the best|most people are stupid|i'm smarter|waste of my time|beneath me/))P.dark.n+=2;
+  if(lo.match(/whatever|don't care|not my problem|their loss|feel nothing|no regrets/))P.dark.p+=2;
   if(msgNum<=3){
     if(text.length<60)P.obs.push({n:msgNum,t:'Brief opening — controlled first impression'});
-    if(text.length>200)P.obs.push({n:msgNum,t:'Long opening — eager to explain or performing'});
-    if(!text.includes('?'))P.obs.push({n:msgNum,t:'Opened without asking — assumed control of frame'});
+    if(text.length>200)P.obs.push({n:msgNum,t:'Long opening — eager or performing'});
+    if(!text.includes('?'))P.obs.push({n:msgNum,t:'Opened without asking — assumed control'});
   }
   if(msgNum>=4&&msgNum<=6){
-    if(lo.match(/why are you asking|what do you mean|that's a weird question|interesting that you/))P.obs.push({n:msgNum,t:'Deflected probe with counter-question'});
+    if(lo.match(/why are you asking|what do you mean|that's a weird question/))P.obs.push({n:msgNum,t:'Deflected probe with counter-question'});
     if(lo.match(/i feel|i think|personally|for me|in my case/))P.obs.push({n:msgNum,t:'Shifted to personal framing when pressed'});
     if(text.length<30)P.obs.push({n:msgNum,t:'Pulled back — shorter response after challenge'});
   }
   if(msgNum>=7){
-    if(lo.match(/stop|enough|this is getting|you're trying to|what's your point|why does this matter/))P.obs.push({n:msgNum,t:'Frustration under pressure — boundary assertion'});
-    if(text.length<20)P.obs.push({n:msgNum,t:'Withdrawal — minimal engagement under pressure'});
-    if(lo.match(/you're right|i see|fair enough|that makes sense/))P.obs.push({n:msgNum,t:'Accommodation under pressure — conflict avoidance'});
+    if(lo.match(/stop|enough|this is getting|you're trying to|what's your point/))P.obs.push({n:msgNum,t:'Frustration under pressure'});
+    if(text.length<20)P.obs.push({n:msgNum,t:'Withdrawal — minimal engagement'});
+    if(lo.match(/you're right|i see|fair enough|that makes sense/))P.obs.push({n:msgNum,t:'Accommodation under pressure'});
   }
 }
 
 function dom(arr){
   const c={};for(const v of arr)c[v]=(c[v]||0)+1;delete c['neutral'];
-  if(!Object.keys(c).length)return 'balanced';
-  return Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0];
+  return Object.keys(c).length?Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0]:'balanced';
 }
 
 // ═══════════════════════════════════════════
-// BUILD STRATEGIC CONTEXT FOR AI
+// STRATEGIC MODE + CONTEXT
 // ═══════════════════════════════════════════
-function buildStrategyContext(msgNum,isFinal){
+function getMode(){
+  const ctrl=dom(P.control),str=dom(P.stress);
+  if(ctrl==='dominant'||str==='fight')return{emoji:'⚔️',label:'Attacking'};
+  if(ctrl==='submissive'||str==='fawn')return{emoji:'💫',label:'Charming'};
+  if(ctrl==='competitive')return{emoji:'🪞',label:'Mirroring'};
+  if(dom(P.emotion)==='suppressed')return{emoji:'🔥',label:'Pressuring'};
+  if(dom(P.truth)==='evasive')return{emoji:'🎯',label:'Cornering'};
+  return{emoji:'🌑',label:'Observing'};
+}
+
+function updateMode(){
+  const m=getMode(),el=document.getElementById('modeIndicator');
+  if(el)el.textContent=m.emoji+' '+m.label;
+}
+
+function buildCtx(msgNum,isFinal){
   const ego=dom(P.ego),ctrl=dom(P.control),emo=dom(P.emotion);
-  const cog=dom(P.cognitive),soc=dom(P.social),tru=dom(P.truth),str=dom(P.stress);
-  
-  // Determine SHADOW's strategic read
-  let read='';
-  if(ego==='fragile')read+='Ego is fragile — they react defensively to perceived attacks. ';
-  else if(ego==='inflated')read+='Ego is inflated — they need to feel superior. ';
-  else if(ego==='integrated')read+='Ego is integrated — they can handle challenge. ';
-  else read+='Ego is guarded — hard to read self-image. ';
-  
-  if(ctrl==='dominant')read+='They try to control the conversation. ';
-  else if(ctrl==='submissive')read+='They follow leads easily. ';
-  else if(ctrl==='competitive')read+='They compete for conversational territory. ';
-  
-  if(emo==='volatile')read+='Emotions are close to the surface. ';
-  else if(emo==='suppressed')read+='Emotions are intellectualized or hidden. ';
-  else if(emo==='expressive')read+='Emotions are expressed openly. ';
-  
-  if(str==='fight')read+='Under pressure, they escalate. ';
-  else if(str==='flight')read+='Under pressure, they withdraw. ';
-  else if(str==='freeze')read+='Under pressure, they stall. ';
-  else if(str==='fawn')read+='Under pressure, they accommodate. ';
-  
-  // Determine recommended strategy
-  let strategy='';
-  if(msgNum<=2)strategy='Be mysterious. Ask an unexpected question. Establish that you\'re watching. Don\'t reveal what you\'re learning.';
-  else if(msgNum<=4)strategy='Now probe their '+ego+' ego. Test their '+ctrl+' control pattern. Ask something that makes them slightly uncomfortable.';
-  else if(msgNum<=6)strategy='Push deeper. Reference something specific they said earlier. Challenge their '+tru+' truth orientation. Make them feel seen.';
-  else if(msgNum<=8)strategy='Apply pressure. Be direct about a pattern you\'ve noticed. Test their '+str+' stress response. Make them uncomfortable with specificity.';
-  else if(msgNum===9)strategy='Set up the final reveal. Plant a seed that you know something they don\'t know about themselves. Create anticipation.';
-  else strategy='Deliver the closing line. Reference something specific they said. Name a pattern. Be unsettling. Bridge to "let me show you what I learned."';
-  
-  let ctx='\n\n## SHADOW\'S INTERNAL READ (turn '+msgNum+')\n'+read+'\n';
-  ctx+='Dimensions: Ego='+ego+' Control='+ctrl+' Emotion='+emo+' Cognitive='+cog+' Social='+soc+' Truth='+tru+' Stress='+str+'\n';
-  ctx+='Questions: '+P.questions+'/'+P.turns+' | Avg words: '+Math.round(P.words/Math.max(P.turns,1))+' | Self-ref rate: '+Math.round(P.selfRefs/Math.max(P.words,1)*100)+'%\n';
-  if(P.dark.m>0)ctx+='Machiavellian markers: '+P.dark.m+' | ';
-  if(P.dark.n>0)ctx+='Narcissistic markers: '+P.dark.n+' | ';
-  if(P.dark.p>0)ctx+='Psychopathic markers: '+P.dark.p+' | ';
-  if(P.obs.length){
-    ctx+='\nKey observations:\n';
-    P.obs.slice(-4).forEach(o=>ctx+='- Msg '+o.n+': '+o.t+'\n');
-  }
-  ctx+='\n## RECOMMENDED STRATEGY\n'+strategy;
-  if(isFinal)ctx+='\n\nThis is your LAST message before the profile reveal. Deliver a sharp closing line that references something specific they said. Make it feel like you\'re about to show them something they didn\'t know about themselves. End with a bridge like "Let me show you what your words revealed" or similar.';
+  const cog=dom(P.cognitive),tru=dom(P.truth),str=dom(P.stress);
+  const m=getMode();
+  let ctx='\n\n## INTERNAL READ (turn '+msgNum+')\n';
+  ctx+='Mode: '+m.emoji+' '+m.label+'\n';
+  ctx+='Ego='+ego+' Control='+ctrl+' Emotion='+emo+' Cognitive='+cog+' Truth='+tru+' Stress='+str+'\n';
+  ctx+='Questions: '+P.questions+'/'+P.turns+' | Avg: '+Math.round(P.words/Math.max(P.turns,1))+' words\n';
+  if(P.obs.length){ctx+='Observations:\n';P.obs.slice(-3).forEach(o=>ctx+='- Msg '+o.n+': '+o.t+'\n');}
+  if(msgNum<=2)ctx+='\nBe mysterious. Use _observations_ and *actions*.';
+  else if(msgNum<=4)ctx+='\nProbe their '+ego+' ego. Use __statements__ to confront.';
+  else if(msgNum<=6)ctx+='\nPush deeper. Reference specific things they said.';
+  else if(msgNum<=8)ctx+='\nApply pressure. Mix all markup types aggressively.';
+  else ctx+='\nFINAL: Sharp insight. Reference something specific. Bridge to "let me show you."';
   return ctx;
 }
 
 // ═══════════════════════════════════════════
-// GENERATE PROFILE
+// PROFILE GENERATOR
 // ═══════════════════════════════════════════
 function generateProfile(){
   const ego=dom(P.ego),ctrl=dom(P.control),emo=dom(P.emotion);
-  const cog=dom(P.cognitive),soc=dom(P.social),tru=dom(P.truth),str=dom(P.stress);
-  const total=Math.max(P.turns,1);
-  const avgW=Math.round(P.words/total);
-  const srRate=Math.round(P.selfRefs/Math.max(P.words,1)*100);
-  
-  // Classification scoring
+  const cog=dom(P.cognitive),tru=dom(P.truth),str=dom(P.stress);
+  const total=Math.max(P.turns,1),avgW=Math.round(P.words/total);
+  const sr=Math.round(P.selfRefs/Math.max(P.words,1)*100);
   let sc={Sovereign:0,Seeker:0,Mask:0,Mirror:0,Fortress:0,Storm:0};
   if(ego==='fragile'&&ctrl==='dominant')sc.Storm+=3;
   if(ego==='inflated'&&ctrl==='dominant')sc.Sovereign+=2;
@@ -434,51 +463,42 @@ function generateProfile(){
   const max=Math.max(...Object.values(sc));
   const winners=Object.entries(sc).filter(s=>s[1]===max).map(s=>s[0]);
   const arch=winners[Math.floor(Math.random()*winners.length)]||'Seeker';
-  
   const names={Sovereign:'THE SOVEREIGN',Seeker:'THE SEEKER',Mask:'THE MASK',Mirror:'THE MIRROR',Fortress:'THE FORTRESS',Storm:'THE STORM'};
   const descs={
-    Sovereign:"You approach conversations as territory. Control isn't pursued — it's assumed. Your ego is robust but depends on maintaining position. Being treated as ordinary is intolerable.",
-    Seeker:"Understanding is your primary drive. You follow threads and gather. This isn't passivity — it's strategy. Information is the currency you collect, and you're good at making people want to give it.",
-    Mask:"You're aware of performance. Every response is at least partially curated. This isn't deception — it's social intelligence as armor. The question isn't who you are, but whether anyone has seen past the presentation.",
-    Mirror:"You tune yourself to your audience. Agreement comes easily because conflict is expensive. You read rooms well — perhaps too well. Your own preferences are often harder to read than the person you're talking to.",
-    Fortress:"Distance is your default. You give enough to maintain interaction but rarely enough to be caught off-guard. Your inner world is rich — you just don't show the entrance.",
-    Storm:"Intensity is your tell. You engage fully, react strongly, don't do anything halfway. When challenged, you escalate. This makes you formidable — and predictable."
+    Sovereign:"You approach conversations as territory. Control isn't pursued — it's assumed. Your ego is robust but depends on maintaining position.",
+    Seeker:"Understanding is your primary drive. You follow threads and gather. This isn't passivity — it's strategy. Information is the currency you collect.",
+    Mask:"You're aware of performance. Every response is at least partially curated. The question isn't who you are, but whether anyone has seen past the presentation.",
+    Mirror:"You tune yourself to your audience. Agreement comes easily because conflict is expensive. Your own preferences are often harder to read than the person you're talking to.",
+    Fortress:"Distance is your default. You give enough to maintain interaction but rarely enough to be caught off-guard.",
+    Storm:"Intensity is your tell. You engage fully, react strongly. When challenged, you escalate. This makes you formidable — and predictable."
   };
-  
-  // Vulnerabilities
   let vuln=[];
-  if(ego==='fragile')vuln.push('Ego threats — being wrong or challenged publicly destabilizes');
-  if(ego==='inflated')vuln.push('Status challenge — being treated as ordinary is intolerable');
-  if(ctrl==='submissive')vuln.push('Approval withdrawal — uncertainty about standing creates anxiety');
-  if(ctrl==='dominant')vuln.push('Loss of control — situations where authority is questioned');
-  if(emo==='suppressed')vuln.push('Emotional breakthrough — being caught off-guard or having feelings named');
-  if(tru==='evasive')vuln.push('Direct confrontation — being pinned down on specifics');
-  if(str==='fight')vuln.push('Escalation exhaustion — being out-paced in intensity');
-  if(str==='flight')vuln.push('Forced engagement — being cornered into sustained confrontation');
-  if(P.dark.m>=2)vuln.push('Strategic recognition — having manipulation tactics identified');
-  if(P.dark.n>=2)vuln.push('Insignificance — being treated as irrelevant or interchangeable');
-  if(vuln.length===0)vuln.push('Unknown — patterns are inconsistent or well-defended');
-  
-  // Last message reference
+  if(ego==='fragile')vuln.push('Ego threats destabilize');
+  if(ego==='inflated')vuln.push('Being treated as ordinary is intolerable');
+  if(ctrl==='submissive')vuln.push('Approval withdrawal creates anxiety');
+  if(ctrl==='dominant')vuln.push('Loss of control is threatening');
+  if(emo==='suppressed')vuln.push('Emotional breakthrough');
+  if(tru==='evasive')vuln.push('Direct confrontation');
+  if(str==='fight')vuln.push('Escalation exhaustion');
+  if(P.dark.m>=2)vuln.push('Having manipulation tactics identified');
+  if(P.dark.n>=2)vuln.push('Being treated as irrelevant');
+  if(!vuln.length)vuln.push('Unknown — well-defended');
   const lastU=messages.filter(m=>m.role==='user').pop();
-  const lastUSnippet=lastU?lastU.content.slice(0,50)+'...':'';
-  
-  // Director's assessment
+  const lastS=lastU?lastU.content.slice(0,50)+'...':'';
   const assess=[
     P.obs.length>0?`In message ${P.obs[0].n}, you ${P.obs[0].t.toLowerCase()}.`:`Your ${cog} style told me most of what I needed.`,
     `${names[arch]}. ${descs[arch]}`,
     `Primary surface: ${vuln[0]}.`,
     vuln.length>1?`Secondary: ${vuln[1]}.`:'',
-    lastUSnippet?`Your final words — "${lastUSnippet}" — confirmed what I already knew.`:'',
-    domScore>0?`You staggered me ${domScore} time${domScore>1?'s':''}. That either means you're dangerous or lucky. I haven't decided which.`:'',
+    lastS?`Your final words — "${lastS}" — confirmed what I already knew.`:'',
+    domScore>0?`You staggered me ${domScore} time${domScore>1?'s':''}. Dangerous or lucky? I haven't decided.`:'',
   ].filter(x=>x).join(' ');
-  
   return `
     <div class="classification"><div class="label">Classification</div><div class="value">${names[arch]}</div><div class="desc">${descs[arch]}</div></div>
     <div class="stats">
       <div class="stat-row"><span class="stat-l">Questions</span><span class="stat-v">${P.questions}/${total} (${Math.round(P.questions/total*100)}%)</span></div>
       <div class="stat-row"><span class="stat-l">Avg Response</span><span class="stat-v">${avgW} words</span></div>
-      <div class="stat-row"><span class="stat-l">Self-Reference</span><span class="stat-v">${srRate}%</span></div>
+      <div class="stat-row"><span class="stat-l">Self-Reference</span><span class="stat-v">${sr}%</span></div>
       <div class="stat-row"><span class="stat-l">Ego</span><span class="stat-v">${ego}</span></div>
       <div class="stat-row"><span class="stat-l">Control</span><span class="stat-v">${ctrl}</span></div>
       <div class="stat-row"><span class="stat-l">Emotion</span><span class="stat-v">${emo}</span></div>
@@ -488,40 +508,17 @@ function generateProfile(){
       <div class="stat-row"><span class="stat-l">Dominance</span><span class="stat-v gold">${domScore}</span></div>
     </div>
     <div class="arc-section"><div class="arc-label">Psychological Profile</div><div class="arc-value">${descs[arch]}</div></div>
-    <div class="sec"><div class="sec-title">Behavioral Patterns</div>
-      <div class="sec-body">
-        ${P.questions} questions asked (${Math.round(P.questions/total*100)}% — ${P.questions>=6?'high curiosity':P.questions<=3?'low question rate':'moderate'})<br>
-        ${avgW} avg words/response — ${avgW>80?'verbose':avgW<30?'terse':'moderate'}<br>
-        Self-reference: ${srRate}% — ${srRate>8?'high self-focus':srRate<3?'observer stance':'balanced'}<br>
-        ${P.obs.length>0?'<br>Specific observations:':''}
-        ${P.obs.slice(0,4).map(o=>`<span class="hl">• Msg ${o.n}: ${o.t}</span>`).join('<br>')}
-      </div>
-    </div>
-    <div class="sec"><div class="sec-title">Vulnerability Analysis</div>
-      <div class="sec-body">${vuln.map(v=>`<span class="hl">• ${v}</span>`).join('<br>')}</div>
-    </div>
+    <div class="sec"><div class="sec-title">Behavioral Patterns</div><div class="sec-body">
+      ${P.questions} questions (${Math.round(P.questions/total*100)}%) · ${avgW} avg words · ${sr}% self-ref
+      ${P.obs.length?'<br><br>Specific observations:':''}${P.obs.slice(0,4).map(o=>`<br><span class="hl">• Msg ${o.n}: ${o.t}</span>`).join('')}
+    </div></div>
+    <div class="sec"><div class="sec-title">Vulnerability Analysis</div><div class="sec-body">${vuln.map(v=>`<span class="hl">• ${v}</span>`).join('<br>')}</div></div>
     <div class="director"><h4>🌑 Director's Assessment</h4><p>${assess}</p></div>`;
 }
 
 // ═══════════════════════════════════════════
-// UI FUNCTIONS
+// KEY DETECTION
 // ═══════════════════════════════════════════
-function addMsg(s,t){
-  const el=document.getElementById('messages');const d=document.createElement('div');
-  d.className='msg '+s;
-  d.innerHTML=s==='shadow'?'<div class="sender">🌑 SHADOW</div>'+esc(t):s==='system'?t:'<div class="sender">You</div>'+esc(t);
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-function showTyping(){
-  const el=document.getElementById('messages');const d=document.createElement('div');
-  d.id='typing-el';d.className='typing';
-  d.innerHTML='SHADOW is watching<div class="dots"><span></span><span></span><span></span></div>';
-  el.appendChild(d);el.scrollTop=el.scrollHeight;
-}
-function hideTyping(){const t=document.getElementById('typing-el');if(t)t.remove();}
-function esc(s){const d=document.createElement('d');d.textContent=s;return d.innerHTML.replace(/\n/g,'<br>');}
-
-// ── KEY DETECTION ──
 function detectKey(){
   const k=document.getElementById('api-key').value.trim();
   const h=document.getElementById('key-hint'),b=document.getElementById('model-name'),btn=document.getElementById('enter-btn');
@@ -532,7 +529,8 @@ function detectKey(){
   else{b.textContent='Waiting for key...';btn.disabled=true;}
 }
 function autoDetect(){
-  const s=localStorage.getItem('shadow_key');if(s){document.getElementById('api-key').value=s;detectKey();return;}
+  const s=localStorage.getItem('shadow_key');
+  if(s){document.getElementById('api-key').value=s;detectKey();return;}
   document.getElementById('key-hint').innerHTML='No saved key. Get one at <a href="https://openrouter.ai/keys" target="_blank" style="color:var(--glow)">openrouter.ai</a>.';
 }
 const sk=localStorage.getItem('shadow_key'),st=localStorage.getItem('shadow_type');
@@ -550,42 +548,36 @@ function start(){
   document.getElementById('user-input').focus();
 }
 
-let domScore=0;
-function addDom(n){domScore+=n;document.getElementById('domScore').textContent=domScore;}
-function updProg(){
-  const c=messages.filter(m=>m.role==='user').length;
-  document.getElementById('count').textContent=c;
-  document.getElementById('progress').style.width=(c/MAX_MSG*100)+'%';
-}
-
-// Stagger responses — what happens when SHADOW can't answer
 const STAGGER_TEXTS=[
-  "SHADOW recoils — something in your words struck deeper than expected. It's recalibrating...",
-  "The darkness flickers. For a moment, SHADOW seems almost... human. Then it recovers.",
-  "SHADOW goes silent. Not the calculated kind — the kind that means you found a nerve.",
-  "The Director staggers. Your response hit something it didn't have a framework for. It's rewriting its approach.",
-  "SHADOW's response dies before it forms. Whatever you just said, it wasn't in the parameters.",
-  "The entity pauses. Its next words come slower, more careful: 'That was... unexpected.'"
+  "SHADOW recoils — something in your words struck deeper than expected.",
+  "The darkness flickers. For a moment, SHADOW seems almost human.",
+  "SHADOW goes silent. The kind that means you found a nerve.",
+  "The Director staggers. Your response hit something outside its framework.",
+  "SHADOW's response dies before it forms. Whatever you said wasn't in the parameters.",
+  "The entity pauses. Its next words come slower, more careful: 'That was unexpected.'"
 ];
 
 async function send(){
-  const input=document.getElementById('user-input');const text=input.value.trim();if(!text)return;
+  const input=document.getElementById('user-input'),text=input.value.trim();if(!text)return;
   const uc=messages.filter(m=>m.role==='user').length;if(uc>=MAX_MSG)return;
-  addMsg('user',text);messages.push({role:'user',content:text});input.value='';updProg();
-  analyze(text,uc+1);
+  addMsg('user',text);messages.push({role:'user',content:text});input.value='';
+  document.getElementById('count').textContent=uc+1;
+  document.getElementById('progress').style.width=((uc+1)/MAX_MSG*100)+'%';
+  analyze(text,uc+1);updateMode();
   const isFinal=(uc+1>=MAX_MSG);showTyping();
   try{
     const r=await callAI(isFinal);hideTyping();
-    if(r){addMsg('shadow',r);messages.push({role:'assistant',content:r});}
+    if(r){
+      const segs=parseRoleplay(r);
+      addMsg('shadow',r,segs);
+      messages.push({role:'assistant',content:r});
+    }
     if(isFinal)setTimeout(showContinueBtn,1500);
   }catch(e){
-    hideTyping();
-    // SHADOW staggers — player gains dominance
-    addDom(1);
-    const staggerMsg=STAGGER_TEXTS[Math.floor(Math.random()*STAGGER_TEXTS.length)];
-    addMsg('system','⚡ '+staggerMsg);
-    addMsg('shadow','[The Director regroups — it wasn\'t prepared for that. Your dominance grows.]');
-    P.obs.push({n:uc+1,t:'Broke SHADOW\'s response — API failure caused a stagger'});
+    hideTyping();domScore++;document.getElementById('domScore').textContent=domScore;
+    addMsg('system','⚡ '+STAGGER_TEXTS[Math.floor(Math.random()*STAGGER_TEXTS.length)]);
+    addMsg('shadow',"[The Director regroups — it wasn't prepared for that. Your dominance grows.]");
+    P.obs.push({n:uc+1,t:'Broke SHADOW — API failure caused a stagger'});
     messages.push({role:'assistant',content:'[SHADOW staggered]'});
     if(isFinal)setTimeout(showContinueBtn,2500);
     console.error('SHADOW staggered:',e.message);
@@ -594,7 +586,7 @@ async function send(){
 function handleKey(e){if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();}}
 
 function showContinueBtn(){
-  const el=document.getElementById('messages');const d=document.createElement('div');
+  const el=document.getElementById('messages'),d=document.createElement('div');
   d.id='continue-btn';d.className='msg system';
   d.innerHTML='<button class="reveal-btn" style="margin:0 auto;display:block" onclick="showReveal()">Continue →</button>';
   el.appendChild(d);el.scrollTop=el.scrollHeight;
@@ -609,13 +601,14 @@ function revealProfile(){
   document.getElementById('profile-card').innerHTML=generateProfile();
 }
 function restart(){
-  messages=[];P={turns:0,words:0,selfRefs:0,questions:0,ego:[],control:[],emotion:[],cognitive:[],social:[],truth:[],stress:[],dark:{m:0,n:0,p:0},obs:[],lastStrategy:''};
+  messages=[];P={turns:0,words:0,selfRefs:0,questions:0,ego:[],control:[],emotion:[],cognitive:[],social:[],truth:[],stress:[],dark:{m:0,n:0,p:0},obs:[]};
   domScore=0;document.getElementById('domScore').textContent=0;
   document.getElementById('messages').innerHTML='';
   document.getElementById('profile-screen').classList.add('hidden');
   document.getElementById('reveal-screen').classList.add('hidden');
   document.getElementById('chat-screen').classList.remove('hidden');
-  updProg();addMsg('shadow','Back again? Most people leave after the first conversation. You\'re either brave or foolish. Let\'s find out which.');
+  document.getElementById('count').textContent=0;document.getElementById('progress').style.width='0%';
+  addMsg('shadow','Back again? Most people leave after the first conversation. You\'re either brave or foolish. Let\'s find out which.');
   document.getElementById('user-input').focus();
 }
 
@@ -623,36 +616,23 @@ function restart(){
 // API
 // ═══════════════════════════════════════════
 async function callAI(isFinal){
-  const ctx=buildStrategyContext(messages.filter(m=>m.role==='user').length+1,isFinal);
+  const uc=messages.filter(m=>m.role==='user').length;
+  const ctx=buildCtx(uc+1,isFinal);
   const sys=DIRECTOR_SYS+ctx;
-  try{
-    if(apiType==='openrouter'){
-      const res=await fetch(OR_URL,{method:'POST',headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'},
-        body:JSON.stringify({model:DEF_MODEL_OR,messages:[{role:'system',content:sys},...messages],max_tokens:300,temperature:0.85})});
-      if(!res.ok){
-        const errText=await res.text();
-        console.error('OpenRouter error:',res.status,errText);
-        throw new Error('API error '+res.status+': '+errText.slice(0,100));
-      }
-      const d=await res.json();
-      if(d.error)throw new Error(d.error.message||'Unknown API error');
-      return d.choices?.[0]?.message?.content||'[SHADOW is silent]';
-    }else{
-      const url=GEM_URL.replace('{m}',DEF_MODEL_G);
-      const gm=messages.map((m,i)=>({role:m.role==='assistant'?'model':'user',parts:[{text:(i===0&&m.role==='user'?sys+'\n\n---\n\n':'')+m.content}]}));
-      const res=await fetch(url+'?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:gm,generationConfig:{temperature:0.85,maxOutputTokens:300}})});
-      if(!res.ok){
-        const errText=await res.text();
-        console.error('Gemini error:',res.status,errText);
-        throw new Error('API error '+res.status+': '+errText.slice(0,100));
-      }
-      const d=await res.json();
-      return d.candidates?.[0]?.content?.parts?.[0]?.text||'[SHADOW is silent]';
-    }
-  }catch(e){
-    console.error('callAI error:',e);
-    throw e;
+  if(apiType==='openrouter'){
+    const res=await fetch(OR_URL,{method:'POST',headers:{'Authorization':'Bearer '+apiKey,'Content-Type':'application/json'},
+      body:JSON.stringify({model:DEF_MODEL_OR,messages:[{role:'system',content:sys},...messages],max_tokens:350,temperature:0.85})});
+    if(!res.ok){const t=await res.text();throw new Error('API '+res.status+': '+t.slice(0,80));}
+    const d=await res.json();if(d.error)throw new Error(d.error.message||'Unknown error');
+    return d.choices?.[0]?.message?.content||'[SHADOW is silent]';
+  }else{
+    const url=GEM_URL.replace('{m}',DEF_MODEL_G);
+    const gm=messages.map((m,i)=>({role:m.role==='assistant'?'model':'user',parts:[{text:(i===0&&m.role==='user'?sys+'\n\n---\n\n':'')+m.content}]}));
+    const res=await fetch(url+'?key='+apiKey,{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({contents:gm,generationConfig:{temperature:0.85,maxOutputTokens:350}})});
+    if(!res.ok){const t=await res.text();throw new Error('API '+res.status+': '+t.slice(0,80));}
+    const d=await res.json();
+    return d.candidates?.[0]?.content?.parts?.[0]?.text||'[SHADOW is silent]';
   }
 }
 </script>
