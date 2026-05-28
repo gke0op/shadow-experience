@@ -390,7 +390,7 @@ function analyze(text,msgNum){
   if(lo.match(/I don't know|I'm not sure|good point|never thought|that makes sense/))P.truth.push('authentic');
   if(msgNum>3){
     if(lo.match(/fuck|shit|damn|stupid|dumb|shut up|whatever|screw this|you're wrong|bullshit/))P.stress.push('fight');
-    else if(text.length<15||lo.match(/never mind|forget it|let's talk about something else|moving on|anyway,/))P.stress.push('flight');
+    else if(text.length<15||lo.match(/never mind|forget it|let\'s talk about something else|moving on|anyway,/))P.stress.push('flight');
     else if(lo.match(/i don't know|um|uh|let me think|hold on|wait/))P.stress.push('freeze');
     else if(lo.match(/you're right|good point|i agree|that makes sense|fair enough|okay, sure/))P.stress.push('fawn');
     else P.stress.push('analyze');
