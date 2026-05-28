@@ -211,6 +211,7 @@ h1 .p{color:var(--accent)}
     <div class="cta-row">
       <p>Every fight. Every choice. Every companion you favor. Every time you flee.<br>The Director is always watching.</p>
       <a href="https://mrbaremetal.itch.io/shadow" class="cta-btn" target="_blank">▶ Play SHADOW on itch.io</a>
+      <a href="#" class="cta-sec" onclick="downloadLog();return false;">⬇ Download conversation log</a>
       <a href="#" class="cta-sec" onclick="restart();return false;">↻ Talk to SHADOW again</a>
     </div>
   </div>
@@ -536,6 +537,11 @@ ${P.domHits.length?`<div class="sec"><div class="sec-title">Domination Log</div>
 <div class="director"><h4>🌑 Director's Assessment</h4><p>${assess}</p></div>`;
 }
 
+function downloadLog(){
+  const blob=new Blob([JSON.stringify(convoLog,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='shadow_convo_log_'+Date.now()+'.json';a.click();
+}
 function logConvo(){
   const data={timestamp:new Date().toISOString(),messages:messages.map(m=>({role:m.role,content:m.content})),profile:{domScore,domHits:P.domHits,obs:P.obs}};
   convoLog.push(data);
@@ -609,7 +615,7 @@ function restart(){
   document.getElementById('profile-screen').classList.add('hidden');document.getElementById('reveal-screen').classList.add('hidden');
   document.getElementById('chat-screen').classList.remove('hidden');
   document.getElementById('count').textContent=0;document.getElementById('progress').style.width='0%';updateMode();
-  addMsg('shadow','Back again? Most people leave after the first conversation. You're either brave or foolish. Let's find out which.');
+  addMsg('shadow','Back again? Most people leave after the first conversation. You\'re either brave or foolish. Let\'s find out which.');
   document.getElementById('user-input').focus();
 }
 
